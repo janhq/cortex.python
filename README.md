@@ -1,9 +1,9 @@
-### cortex.pyrunner
+# cortex.pyrunner
 Python embedding on C++
 
 ## Installation:
 
-# Linux and MacOS
+### Linux and MacOS
 1. Install dependencies:
 ```
 # In cortex.pyrunner root dir
@@ -18,7 +18,7 @@ cmake ..
 make -j32
 ```
 
-# Windows (testing)
+### Windows (testing)
 1. Install dependencies
 ```
 # In cortex.pyrunner root dir
@@ -41,7 +41,7 @@ cmake --build . --config Release -j {NUMBER_OF_PROCESSORS}
 
 ## Run the program:
 
-# Linux and MacOS
+### Linux and MacOS
 Go to the `.../build/` directory.
 While running the pyrunner with no argument, it will use the default `.../build/python/` library
 `./pyrunner`
@@ -49,7 +49,7 @@ Or, you can use your desired Python3 version by adding a path to the directory t
 `./pyrunner {PATH_TO_DYNAMIC_LIB_DIR}`
 Then input the path to your Python file that need to be executed.
 
-# Windows
+### Windows
 Go to the `.../build/Release/` folder.
 While running the pyrunner with no argument, it will use the default `.../build/Release/python/` library 
 `./pyrunner.exe`
@@ -67,7 +67,7 @@ for path in sys.path:
 print("Hello from Cortex!")
 ```
 
-# Linux
+### Linux
 | Default library | With specifict .so file |
 |------------------|------------------|
 |
