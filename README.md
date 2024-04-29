@@ -10,7 +10,7 @@ Python embedding on C++
 ./install_deps.sh
 ```
 
-1. Build the project
+2. Build the project
 ```
 # In cortex.pyrunner root dir
 mkdir build && cd build
@@ -26,7 +26,7 @@ cmake -S ./pyrunner_deps -B ./build_deps/pyrunner_deps
 cmake --build ./build_deps/pyrunner_deps --config Release
 ```
 
-1. Build the project
+2. Build the project
 ```
 # In cortex.pyrunner root dir
 mkdir -p build
@@ -36,8 +36,7 @@ cmake --build . --config Release -j {NUMBER_OF_PROCESSORS}
 # Replace NUMBER_OF_PROCESSORS with an actual number
 ```
 
-1. Copy the `.../build/python/` folder to `.../build/Release/python/`.
-`pyrunner.exe` and `python/` must be in the same folder.
+3. Copy the `.../build/python/` folder to `.../build/Release/python/` (`pyrunner.exe` and `python/` must be in the same folder)
 
 ## Run the program:
 
