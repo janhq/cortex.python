@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
-project(pyrunner C CXX)
+project(cortex.python-runtime C CXX)
+SET(TARGET engine)
 
 include(CheckIncludeFileCXX)
 
@@ -27,7 +28,7 @@ if(CMAKE_CXX_STANDARD LESS 17)
   # With C++14, use boost to support any and std::string_view
   message(STATUS "use c++14")
   find_package(Boost 1.61.0 REQUIRED)
-  target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
+  target_include_directories(${TARGET} PRIVATE ${Boost_INCLUDE_DIRS})
 elseif(CMAKE_CXX_STANDARD LESS 20)
   message(STATUS "use c++17")
 else()
@@ -35,14 +36,21 @@ else()
 endif()
 # This is the critical line for installing another package
 
+find_library(JSONCPP
+    NAMES jsoncpp
+    HINTS "${CMAKE_CURRENT_SOURCE_DIR}/build_deps/_install/lib/"
+)
 
-add_executable(${PROJECT_NAME} main.cc)
+find_library(TRANTOR
+    NAMES trantor
+    HINTS "${CMAKE_CURRENT_SOURCE_DIR}/build_deps/_install/lib/"
+)
 
 
 # Copy the python3 related files to the build folder
 if (WIN32)
   # Copy the whole library
-  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/build_deps/_install/python DESTINATION ${CMAKE_BINARY_DIR})
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/build_deps/_install/python DESTINATION ${CMAKE_BINARY_DIR}/Release)
 else() # APPLE and LINUX
   # Copy library files
   file(GLOB PYTHON_LIBS ${CMAKE_CURRENT_SOURCE_DIR}/build_deps/_install/lib/python*)
@@ -71,15 +79,20 @@ else() # APPLE and LINUX
   endforeach()
 endif()
 
-
 if(WIN32)
   # dlfcn for dynamic library
   find_package(dlfcn-win32 REQUIRED)
-  target_link_libraries(${PROJECT_NAME} PRIVATE dlfcn-win32::dl)
+  target_link_libraries(${TARGET} PRIVATE dlfcn-win32::dl)
 endif()
 
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(${TARGET} SHARED 
+    src/PythonRuntimeEngine.cc
+)
 
-target_sources(${PROJECT_NAME} PRIVATE ${CTL_SRC} ${COMMON_SRC} ${CONTEXT_SRC})
+target_link_libraries(${TARGET} PRIVATE ${JSONCPP} ${TRANTOR} ${CMAKE_THREAD_LIBS_INIT})
 
+# aux_source_directory(src SRC)
+target_sources(${TARGET} PRIVATE ${SRC})
+
+target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/build_deps/_install/include/)
