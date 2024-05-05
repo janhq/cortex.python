@@ -7,6 +7,8 @@
 #include <string>
 #include <iostream>
 
+#include "trantor/utils/Logger.h"
+
 #if defined(_WIN32)
   #define PY_DL HMODULE
   #define PY_LOAD_LIB(path) LoadLibraryW(nitro_utils::stringToWString(path).c_str());
@@ -33,7 +35,7 @@
 #include <mach-o/dyld.h>
 #endif
 
-namespace python_embedding_helper {
+namespace PythonRuntimeUtils {
 
 typedef long Py_ssize_t;
 typedef struct _object PyObject;
@@ -124,8 +126,7 @@ inline std::string findPythonLib(const std::string& libDir) {
   // Linux or other Unix-like systems
   pattern = "libpython[0-9]+\\.[0-9]+\\.so.*";
 #endif
-  // LOG_DEBUG << "CAMERON finding pattern " << pattern << " in " << libDir;
-  fprintf(stderr, "finding pattern %s in %s\n", pattern.c_str(), libDir.c_str());
+  LOG_DEBUG << "CAMERON finding pattern " << pattern << " in " << libDir;
   std::regex regexPattern(pattern);
   for (const auto& entry : std::filesystem::directory_iterator(libDir)) {
     std::string fileName = entry.path().filename().string();
@@ -133,7 +134,7 @@ inline std::string findPythonLib(const std::string& libDir) {
       return entry.path().string();
     }
   }
-  return "";  // Return an empty string if no matching library is found
+  return ""; // Return an empty string if no matching library is found
 }
 
 inline void clearAndSetPythonSysPath(std::string default_py_lib_path, PY_DL py_dl) {  
@@ -170,28 +171,23 @@ inline void executePythonFile(std::string nitro_root_path, std::string py_file_p
   if (py_lib_path == "") {
     isPyDefaultLib = true;
     py_lib_path = nitro_root_path + "python/";
-    // LOG_WARN << "No specified Python library path, using default Python library in " << py_lib_path;
-    fprintf(stderr, "No specified Python library path, using default Python library in %s\n", py_lib_path.c_str());
+    LOG_WARN << "No specified Python library path, using default Python library in " << py_lib_path;
   }
 
   std::string py_dl_path = findPythonLib(py_lib_path);
   if (py_dl_path == "") {
-    // LOG_ERROR << "Could not find Python dynamic library file in path: " << py_lib_path;
-    fprintf(stderr, "Could not find Python dynamic library file in path: %s\n", py_lib_path.c_str());
+    LOG_ERROR << "Could not find Python dynamic library file in path: " << py_lib_path;
     return;
   } else {
-    // LOG_DEBUG << "Found dynamic library file " << py_dl_path;
-    fprintf(stderr, "Found dynamic library file %s\n", py_dl_path.c_str());
+    LOG_DEBUG << "Found dynamic library file " << py_dl_path;;
   }
 
   PY_DL py_dl = PY_LOAD_LIB(py_dl_path);
   if (!py_dl) {
-    // LOG_ERROR << "Failed to load Python dynamic library from file: " << py_dl_path;
-    fprintf(stderr, "Failed to load Python dynamic library from file: %s\n", py_dl_path.c_str());
+    LOG_ERROR << "Failed to load Python dynamic library from file: " << py_dl_path;
     return;
   } else {
-    // LOG_INFO << "Successully loaded Python dynamic library from path: " << py_dl_path;
-    fprintf(stderr, "Successully loaded Python dynamic library from file: %s\n", py_dl_path.c_str());
+    LOG_INFO << "Successully loaded Python dynamic library from path: " << py_dl_path;
   }
 
   auto Py_Initialize = (Py_InitializeFunc)GET_PY_FUNC(py_dl, "Py_Initialize");
@@ -201,8 +197,7 @@ inline void executePythonFile(std::string nitro_root_path, std::string py_file_p
   auto PyRun_SimpleFile = (PyRun_SimpleFileFunc)GET_PY_FUNC(py_dl, "PyRun_SimpleFile");
 
   if (!Py_Initialize || !Py_Finalize || !PyErr_Print || !PyRun_SimpleString || !PyRun_SimpleFile) {
-    // fprintf(stderr, "Failed to bind necessary Python functions\n");
-    fprintf(stderr, "Failed to bind necessary Python functions\n");
+    LOG_ERROR << "Failed to bind necessary Python functions";
     PY_FREE_LIB(py_dl);
     return;
   }
@@ -211,18 +206,18 @@ inline void executePythonFile(std::string nitro_root_path, std::string py_file_p
   Py_Initialize();
 
   if (isPyDefaultLib) {
+    // Re-route the sys paths to Python default library
     clearAndSetPythonSysPath(py_lib_path, py_dl);
   }
 
-  // LOG_INFO << "Trying to run Python file in path " << py_file_path;
-  fprintf(stderr, "Trying to run Python file in path %s\n\n", py_file_path.c_str());
+  LOG_INFO << "Trying to run Python file in path " << py_file_path << "\n";
   FILE* file = fopen(py_file_path.c_str(), "r");
   if (file == NULL) {
-    fprintf(stderr, "Failed to open %s\n", py_file_path.c_str());
+    LOG_ERROR << "Failed to open file " << py_file_path;
   } else {
     if (PyRun_SimpleFile(file, py_file_path.c_str() ) != 0) {
       PyErr_Print();
-      fprintf(stderr, "Python script file execution failed.\n");
+      LOG_ERROR << "Failed to execute file " << py_file_path;
     }
     fclose(file);
   }
@@ -232,4 +227,4 @@ inline void executePythonFile(std::string nitro_root_path, std::string py_file_p
 }
 
 
-} // namespace python_embedding_helper
+} // namespace PythonRuntimeUtils
