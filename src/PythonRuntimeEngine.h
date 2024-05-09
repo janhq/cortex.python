@@ -8,7 +8,12 @@
 
 class PythonRuntimeEngine : public EngineI {
     public: 
-    ~PythonRuntimeEngine();
+    ~PythonRuntimeEngine() final;
+
+    void ExecutePythonFile(
+        std::string binary_exec_path,
+        std::string pythonFileExecutionPath,
+        std::string pythonLibraryPath) final;
     
     void HandlePythonFileExecutionRequest(
         std::shared_ptr<Json::Value> jsonBody,

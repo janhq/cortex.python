@@ -11,7 +11,7 @@
 
 #if defined(_WIN32)
   #define PY_DL HMODULE
-  #define PY_LOAD_LIB(path) LoadLibraryW(nitro_utils::stringToWString(path).c_str());
+  #define PY_LOAD_LIB(path) LoadLibraryW(PythonRuntimeUtils::stringToWString(path).c_str());
   #define GET_PY_FUNC GetProcAddress
   #define PY_FREE_LIB FreeLibrary
 #else
@@ -163,14 +163,16 @@ inline void clearAndSetPythonSysPath(std::string default_py_lib_path, PY_DL py_d
   }
 }
 
-inline void executePythonFile(std::string nitro_root_path, std::string py_file_path ,std::string py_lib_path) {
+inline void executePythonFile(std::string binary_exec_path, std::string py_file_path ,std::string py_lib_path) {
 
   signal(SIGINT, signalHandler);
+
+  std::string binary_dir_path = PythonRuntimeUtils::getDirectoryPathFromFilePath(binary_exec_path);
 
   bool isPyDefaultLib = false;
   if (py_lib_path == "") {
     isPyDefaultLib = true;
-    py_lib_path = nitro_root_path + "python/";
+    py_lib_path = binary_dir_path + "python/";
     LOG_WARN << "No specified Python library path, using default Python library in " << py_lib_path;
   }
 
@@ -210,7 +212,7 @@ inline void executePythonFile(std::string nitro_root_path, std::string py_file_p
     clearAndSetPythonSysPath(py_lib_path, py_dl);
   }
 
-  LOG_INFO << "Trying to run Python file in path " << py_file_path << "\n";
+  LOG_INFO << "Trying to run Python file in path " << py_file_path;
   FILE* file = fopen(py_file_path.c_str(), "r");
   if (file == NULL) {
     LOG_ERROR << "Failed to open file " << py_file_path;

@@ -69,10 +69,22 @@ inline void signal_handler(int signal) {
 using SyncQueue = Server::SyncQueue;
 
 int main(int argc, char** argv) {
-  std::string hostname = "127.0.0.1";
-  int port = 3928;
-
+  
   Server server;
+
+  // Check if this process is for python execution
+  if (argc > 1) {
+    if (strcmp(argv[1], "--run_python_file") == 0) {
+        std::string py_home_path = (argc > 3) ? argv[3] : "";
+        server.engine_->ExecutePythonFile(argv[0], argv[2], py_home_path);
+        return 0;
+    }
+  } 
+
+  // This process is for running the server
+  std::string hostname = (argc > 1) ? argv[1] : "127.0.0.1";
+  int port             = (argc > 2) ? std::atoi(argv[2]) : 3928;
+
   Json::Reader r;
   auto svr = std::make_unique<httplib::Server>();
   
@@ -82,13 +94,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  auto process_res = [&server](httplib::Response& resp, SyncQueue& q) {
-    auto [status, res] = q.wait_and_pop();
-    resp.set_content(res.toStyledString().c_str(), "application/json; charset=utf-8");
-    resp.status = status["status_code"].asInt();
-  };
-
-  const auto handle_file_execution = [&](const httplib::Request& req, httplib::Response& resp) {
+  const auto handle_file_execution = [&r, &server](const httplib::Request& req, httplib::Response& resp) {
     resp.set_header("Access-Control-Allow-Origin", req.get_header_value("Origin"));
     auto req_body = std::make_shared<Json::Value>();
     r.parse(req.body, *req_body);
@@ -102,7 +108,44 @@ int main(int argc, char** argv) {
 
   svr->Post("/execute", handle_file_execution);
 
+  LOG_INFO << "HTTP server listening: " << hostname << ":" << port;
+  svr->new_task_queue = [] {
+    return new httplib::ThreadPool(5);
+  };
+  // run the HTTP server in a thread - see comment below
+  std::thread t([&]() {
+    if (!svr->listen_after_bind()) {
+      return 1;
+    }
 
+    return 0;
+  });
+  std::atomic<bool> running = true;
 
+  shutdown_handler = [&](int) {
+    running = false;
+  };
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+  struct sigaction sigint_action;
+  sigint_action.sa_handler = signal_handler;
+  sigemptyset(&sigint_action.sa_mask);
+  sigint_action.sa_flags = 0;
+  sigaction(SIGINT, &sigint_action, NULL);
+  sigaction(SIGTERM, &sigint_action, NULL);
+#elif defined(_WIN32)
+  auto console_ctrl_handler = +[](DWORD ctrl_type) -> BOOL {
+    return (ctrl_type == CTRL_C_EVENT) ? (signal_handler(SIGINT), true) : false;
+  };
+  SetConsoleCtrlHandler(
+      reinterpret_cast<PHANDLER_ROUTINE>(console_ctrl_handler), true);
+#endif
 
+  while (running) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+
+  svr->stop();
+  t.join();
+  LOG_DEBUG << "Server shutdown";
+  return 0;
 }

@@ -1,3 +1,3 @@
-cmake -S ./python-runtime_deps -B ./build_deps/python-runtime_deps
-make -C ./build_deps/python-runtime_deps -j 10
-rm -rf ./build_deps/python-runtime_deps
+cmake -S ./third-party -B ./build_deps/third-party
+make -C ./build_deps/third-party -j 10
+rm -rf ./build_deps/third-party

@@ -24,8 +24,8 @@ make -j32
 1. Install dependencies
 ```powershell
 # In cortex.python-runtime\ root dir
-cmake -S ./python-runtime_deps -B ./build_deps/python-runtime_deps
-cmake --build ./build_deps/python-runtime_deps --config Release
+cmake -S ./third-party -B ./build_deps/third-party
+cmake --build ./build_deps/third-party --config Release
 ```
 
 2. Build the project
