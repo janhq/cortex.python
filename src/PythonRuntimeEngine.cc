@@ -77,7 +77,6 @@ void PythonRuntimeEngine::HandlePythonFileExecutionRequestImpl(
     }
 #else
     std::string child_process_exe_path = PythonRuntimeUtils::getCurrentExecutablePath();
-    LOG_DEBUG << "Cameron " << child_process_exe_path;
     std::vector<char*> child_process_args;
     child_process_args.push_back(const_cast<char*>(child_process_exe_path.c_str()));
     child_process_args.push_back(const_cast<char*>("--run_python_file"));

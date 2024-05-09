@@ -126,7 +126,6 @@ inline std::string findPythonLib(const std::string& libDir) {
   // Linux or other Unix-like systems
   pattern = "libpython[0-9]+\\.[0-9]+\\.so.*";
 #endif
-  LOG_DEBUG << "CAMERON finding pattern " << pattern << " in " << libDir;
   std::regex regexPattern(pattern);
   for (const auto& entry : std::filesystem::directory_iterator(libDir)) {
     std::string fileName = entry.path().filename().string();
