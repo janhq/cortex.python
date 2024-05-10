@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
-project(cortex.python-runtime C CXX)
-SET(TARGET engine)
+project(server)
+
+find_package(Threads REQUIRED)
+
+if(UNIX AND NOT APPLE)
+  set(LINKER_FLAGS -ldl)
+endif()
 
 include(CheckIncludeFileCXX)
 
@@ -20,11 +25,16 @@ endif()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(OPENSSL_USE_STATIC_LIBS TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build_deps/_install)
+set(OPENSSL_USE_STATIC_LIBS TRUE)
 
-SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+add_executable(${PROJECT_NAME}
+    server.cc
+    dylib.h
+    httplib.h
+)
+
+set(THIRD_PARTY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../build_deps/_install)
 
 if(CMAKE_CXX_STANDARD LESS 17)
   # With C++14, use boost to support any and std::string_view
@@ -38,13 +48,6 @@ else()
 endif()
 # This is the critical line for installing another package
 
-if(UNIX AND NOT APPLE)
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC")
-  add_compile_options(-fPIC)
-endif()
-
-set(THIRD_PARTY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build_deps/_install)
-
 find_library(JSONCPP
     NAMES jsoncpp
     HINTS "${THIRD_PARTY_PATH}/lib/"
@@ -54,7 +57,6 @@ find_library(TRANTOR
     NAMES trantor
     HINTS "${THIRD_PARTY_PATH}/lib/"
 )
-
 
 # Copy the python3 related files to the build folder
 if (WIN32)
@@ -95,14 +97,9 @@ endif()
 if(WIN32)
   # dlfcn for dynamic library
   find_package(dlfcn-win32 REQUIRED)
-  target_link_libraries(${TARGET} PRIVATE dlfcn-win32::dl)
+  target_link_libraries(${PROJECT_NAME} PRIVATE dlfcn-win32::dl)
 endif()
 
+target_link_libraries(${PROJECT_NAME} PRIVATE ${JSONCPP} ${TRANTOR} ${LINKER_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
 
-add_library(${TARGET} SHARED 
-    src/PythonRuntimeEngine.cc
-)
-
-target_link_libraries(${TARGET} PRIVATE ${JSONCPP} ${TRANTOR} ${CMAKE_THREAD_LIBS_INIT})
-
-target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${THIRD_PARTY_PATH}/include/)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../ ${THIRD_PARTY_PATH}/include/)
