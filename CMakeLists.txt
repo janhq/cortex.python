@@ -100,7 +100,7 @@ endif()
 
 
 add_library(${TARGET} SHARED 
-    src/PythonRuntimeEngine.cc
+    src/python_runtime_engine.cc
 )
 
 target_link_libraries(${TARGET} PRIVATE ${JSONCPP} ${TRANTOR} ${CMAKE_THREAD_LIBS_INIT})
