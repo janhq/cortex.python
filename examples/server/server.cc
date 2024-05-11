@@ -1,15 +1,15 @@
-#include <jsoncpp/json/forwards.h>
 #include <memory>
 #include <string>
-#include <signal.h>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <signal.h>
 
 #include "dylib.h"
 #include "httplib.h"
 #include "json/reader.h"
-#include "base/cortex-common/EngineI.h"
+#include "jsoncpp/json/forwards.h"
+#include "base/cortex-common/enginei.h"
 #include "trantor/utils/Logger.h"
 
 class Server {
@@ -26,18 +26,18 @@ class Server {
     }
   }
 
- public:
-  std::unique_ptr<dylib> dylib_;
-  EngineI* engine_;
+  EngineI* GetEngine() const {
+    return engine_;
+  }
 
   struct SyncQueue {
-    void push(std::pair<Json::Value, Json::Value>&& p) {
+    void Push(std::pair<Json::Value, Json::Value>&& p) {
       std::unique_lock<std::mutex> l(mtx);
       q.push(p);
       cond.notify_one();
     }
 
-    std::pair<Json::Value, Json::Value> wait_and_pop() {
+    std::pair<Json::Value, Json::Value> WaitAndPop() {
       std::unique_lock<std::mutex> l(mtx);
       cond.wait(l, [this] { return !q.empty(); });
       auto res = q.front();
@@ -50,12 +50,17 @@ class Server {
     // Status and result
     std::queue<std::pair<Json::Value, Json::Value>> q;
   };
+
+private:
+  std::unique_ptr<dylib> dylib_;
+  EngineI* engine_;
+
 };
 
 std::function<void(int)> shutdown_handler;
 std::atomic_flag is_terminating = ATOMIC_FLAG_INIT;
 
-inline void signal_handler(int signal) {
+inline void SignalHandler(int signal) {
   if (is_terminating.test_and_set()) {
     // in case it hangs, we can force terminate the server by hitting Ctrl+C twice
     // this is for better developer experience, we can remove when the server is stable enough
@@ -76,7 +81,7 @@ int main(int argc, char** argv) {
   if (argc > 1) {
     if (strcmp(argv[1], "--run_python_file") == 0) {
         std::string py_home_path = (argc > 3) ? argv[3] : "";
-        server.engine_->ExecutePythonFile(argv[0], argv[2], py_home_path);
+        server.GetEngine()->ExecutePythonFile(argv[0], argv[2], py_home_path);
         return 0;
     }
   } 
@@ -98,7 +103,7 @@ int main(int argc, char** argv) {
     resp.set_header("Access-Control-Allow-Origin", req.get_header_value("Origin"));
     auto req_body = std::make_shared<Json::Value>();
     r.parse(req.body, *req_body);
-    server.engine_->HandlePythonFileExecutionRequest(
+    server.GetEngine()->HandlePythonFileExecutionRequest(
         req_body, [&server, &resp](Json::Value status, Json::Value res) {
           resp.set_content(res.toStyledString().c_str(),
                            "application/json; charset=utf-8");
@@ -127,7 +132,7 @@ int main(int argc, char** argv) {
   };
 #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
   struct sigaction sigint_action;
-  sigint_action.sa_handler = signal_handler;
+  sigint_action.sa_handler = SignalHandler;
   sigemptyset(&sigint_action.sa_mask);
   sigint_action.sa_flags = 0;
   sigaction(SIGINT, &sigint_action, NULL);
