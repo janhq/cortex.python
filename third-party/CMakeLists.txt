@@ -106,8 +106,6 @@ if(WIN32)
 			-DBUILD_SHARED_LIBS=OFF
 			-DBUILD_TESTS=OFF
   )
-  add_library(dlfcn-win32 STATIC IMPORTED)
-  add_dependencies(dlfcn-win32 dlfcn-win32)
 endif()
 
 # Install Python3 library
