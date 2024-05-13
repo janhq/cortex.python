@@ -44,7 +44,7 @@ if not defined pid (
 rem Wait for a few seconds to let the server start
 
 rem Define JSON strings for curl data
-@REM call set "PYTHON_FILE_EXECUTION_PATH_STRING=%%PYTHON_FILE_EXECUTION_PATH:\=\\%%"
+call set "PYTHON_FILE_EXECUTION_PATH_STRING=%%PYTHON_FILE_EXECUTION_PATH:\=\\%%"
 set "curl_data1={\"file_execution_path\":\"%PYTHON_FILE_EXECUTION_PATH_STRING%\"}"
 
 rem Print the values of curl_data for debugging
@@ -74,7 +74,7 @@ if "%error_occurred%"=="1" (
 )
 
 echo ----------------------
-echo Log server:
+echo Server logs:
 type %TEMP%\server.log
 
 echo Server test run successfully!

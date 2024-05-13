@@ -1,5 +1,6 @@
 #include "python_runtime_engine.h"
 #include "python_runtime_utils.h"
+#include "trantor/utils/Logger.h"
 
 #if defined(_WIN32)
   #include <process.h>
@@ -45,6 +46,7 @@ void PythonRuntimeEngine::HandlePythonFileExecutionRequestImpl(
   Json::Value status_resp;
 
   if (file_execution_path == "") {
+      LOG_ERROR << "No specified Python file path";
       json_resp["message"] = "No specified Python file path";
       status_resp["status_code"] = k400BadRequest;
       callback(std::move(status_resp), std::move(json_resp));
