@@ -8,7 +8,7 @@
 #include "dylib.h"
 #include "httplib.h"
 #include "json/reader.h"
-#include "jsoncpp/json/forwards.h"
+#include "json/forwards.h"
 #include "base/cortex-common/enginei.h"
 #include "trantor/utils/Logger.h"
 
