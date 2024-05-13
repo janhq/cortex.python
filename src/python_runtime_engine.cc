@@ -57,8 +57,8 @@ void PythonRuntimeEngine::HandlePythonFileExecutionRequestImpl(
 #if defined(_WIN32)
   std::wstring exe_path = PythonRuntimeUtils::getCurrentExecutablePath();
   std::string exe_args_string = " --run_python_file " + file_execution_path;
-  if (py_lib_path != "")
-      exe_args_string += " " + py_lib_path;
+  if (python_library_path != "")
+      exe_args_string += " " + python_library_path;
   std::wstring pyArgs = exe_path + PythonRuntimeUtils::stringToWString(exe_args_string);
 
   STARTUPINFOW si;
