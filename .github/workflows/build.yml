@@ -35,4 +35,6 @@ jobs:
 
       - name: Build
         run: |
-          make hello-cortex
+          make build-example-server
+          make run-e2e-test
+
