@@ -113,14 +113,17 @@ if (UNIX) # APPLE and LINUX
   # Define Python installing configuration
   if(APPLE)
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm.*|ARM64)$")
-      set(PYTHON_INSTALL_CONFIGURATION "--host=aarch64-apple-darwin --build=aarch64-apple-darwin")
+      set(PYTHON_INSTALL_CONFIG_HOST "--host=aarch64-apple-darwin")
+      set(PYTHON_INSTALL_CONFIG_BUILD "--build=aarch64-apple-darwin")
     else()
-      set(PYTHON_INSTALL_CONFIGURATION "--host=x86_64-apple-darwin --build=x86_64-apple-darwin")
+      set(PYTHON_INSTALL_CONFIG_HOST "--host=x86_64-apple-darwin")
+      set(PYTHON_INSTALL_CONFIG_BUILD "--build=x86_64-apple-darwin")
     endif()
-    set(PYTHON_INSTALL_WITH_SSL "--with-openssl=${THIRD_PARTY_INSTALL_PATH}")
+    set(PYTHON_INSTALL_CONFIG_SSL "--with-openssl=${THIRD_PARTY_INSTALL_PATH}")
   else()
-    set(PYTHON_INSTALL_CONFIGURATION "")
-    set(PYTHON_INSTALL_WITH_SSL "")
+    set(PYTHON_INSTALL_CONFIG_HOST "")
+    set(PYTHON_INSTALL_CONFIG_BUILD "")
+    set(PYTHON_INSTALL_CONFIG_SSL "")
   endif()
 
   # Download and install Python3 from source
@@ -128,7 +131,7 @@ if (UNIX) # APPLE and LINUX
     Python3
     URL https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
     PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure ${PYTHON_INSTALL_CONFIGURATION} --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared
+    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD}
     BUILD_COMMAND make -j8 && rm -rf ./Lib/test
     INSTALL_COMMAND make install
     BUILD_IN_SOURCE 1
