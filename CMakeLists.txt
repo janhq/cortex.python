@@ -91,6 +91,7 @@ endif()
 
 if(WIN32)
   # dlfcn for dynamic library
+  set(dlfcn-win32_DIR "${THIRD_PARTY_PATH}/lib/cmake/dlfcn-win32")
   find_package(dlfcn-win32 REQUIRED)
   target_link_libraries(${TARGET} PRIVATE dlfcn-win32::dl)
 endif()
