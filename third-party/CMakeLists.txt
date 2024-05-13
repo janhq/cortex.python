@@ -157,6 +157,8 @@ else() # WINDOWS
   )
 endif()
 
+add_dependencies(trantor c-ares)
+
 include_directories(${THIRD_PARTY_INSTALL_PATH}/include)
 link_directories(${THIRD_PARTY_INSTALL_PATH}/lib)
 # target_link_libraries(<your-target> ...)
