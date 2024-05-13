@@ -19,7 +19,6 @@
   #define PY_LOAD_LIB(path) dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
   #define GET_PY_FUNC dlsym
   #define PY_FREE_LIB dlclose
-  extern char **environ; // Environment variable for posix_spawn
 #endif
 
 #ifdef _WIN32
