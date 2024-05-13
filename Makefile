@@ -19,14 +19,14 @@ else ifeq ($(shell uname -s),Linux) # Linux
 	@cmake -S ./third-party -B ./build_deps/third-party;
 	@make -C ./build_deps/third-party -j8;
 	# @rm -rf ./build_deps/third-party;
-	@mkdir build && cd build; \
+	@mkdir -p build && cd build; \
 	cmake .. $(CMAKE_EXTRA_FLAGS); \
 	make -j8;
 else # MacOS
 	@cmake -S ./third-party -B ./build_deps/third-party
 	@make -C ./build_deps/third-party -j8
 	# @rm -rf ./build_deps/third-party
-	@mkdir build && cd build; \
+	@mkdir -p build && cd build; \
 	cmake .. $(CMAKE_EXTRA_FLAGS); \
 	make -j8;
 endif
