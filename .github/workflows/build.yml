@@ -8,7 +8,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ${{ matrix.runs-on }}
-    needs: [create-draft-release]
     timeout-minutes: 40
     strategy:
       matrix:
