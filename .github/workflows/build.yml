@@ -32,16 +32,15 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install make -y
-          ..\..\install_deps.bat
+          .\install_deps.bat
 
       - name: Install dependencies on Unix
         if: runner.os != 'Windows'
         run: |
-          bash ../../install_deps.sh
+          bash ./install_deps.sh
 
       - name: Build engine 
         run: |
-          cd ../../
           mkdir -p build
           cd build
           cmake ..
@@ -49,7 +48,6 @@ jobs:
 
       - name: Build example server
         run: |
-          cd ../../
           mkdir -p examples/server/build
           cd examples/server/build
           cmake ..
@@ -57,7 +55,6 @@ jobs:
         
       - name: Run e2e test
         run: |
-          cd ../../
           mkdir -p examples/server/build/engines/cortex.python-runtime
           cd examples/server/build/
           cp ../../../build/libengine.so engines/cortex.python-runtime/
