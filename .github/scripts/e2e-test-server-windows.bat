@@ -52,7 +52,7 @@ rem Print the values of curl_data for debugging
 echo curl_data1=%curl_data1%
 
 rem Run the curl commands and capture the status code
-curl.exe --connect-timeout 60 -o "%TEMP%\response1.log" -s -w "%%{http_code}" --location "http://127.0.0.1:%PORT%/execute" --header "Content-Type: application/json" --data "%curl_data1%" > %TEMP%\response1.log 2>&1
+curl.exe --connect-timeout 60 -s -w "%%{http_code}" --location "http://127.0.0.1:%PORT%/execute" --header "Content-Type: application/json" --data "%curl_data1%" > "%TEMP%\response1.log" 2>&1
 
 set "error_occurred=0"
 
@@ -65,7 +65,6 @@ if "%response1%" neq "200" (
     set "error_occurred=1"
 )
 
-rem Print the server logs regardless of success or failure
 echo ----------------------
 echo Server logs:
 type %TEMP%\server.log
@@ -73,7 +72,7 @@ type %TEMP%\server.log
 if "%error_occurred%"=="1" (
     echo Server test run failed!!!!!!!!!!!!!!!!!!!!!!
     taskkill /f /pid %pid%
-    echo An error occurred while running the server.
+    echo An error occurred while running the e2e test.
     exit /b 1
 )
 
