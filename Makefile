@@ -41,6 +41,7 @@ else
 	tar -czvf cortex.python-runtime.tar.gz cortex.python-runtime
 endif
 
+
 run-e2e-test:
 ifeq ($(RUN_TESTS),false)
 	@echo "Skipping tests"

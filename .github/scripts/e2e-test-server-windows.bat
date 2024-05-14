@@ -25,6 +25,13 @@ set /a max=11000
 set /a range=max-min+1
 set /a PORT=%min% + %RANDOM% %% %range%
 
+rem Install numpy for Python
+set "PYTHONHOME=%cd%\python"
+echo Set Python HOME to %PYTHONHOME%
+%PYTHONHOME%\python.exe -m ensurepip
+%PYTHONHOME%\python.exe -m pip install --upgrade pip
+%PYTHONHOME%\python.exe -m pip install numpy --target=%PYTHONHOME%\Lib\site-packages\
+
 rem Start the binary file
 start "" /B "%BINARY_PATH%" "127.0.0.1" %PORT%  > "%TEMP%\server.log" 2>&1
 
@@ -73,6 +80,24 @@ echo ----------------------
 echo Log python file execution:
 type %TEMP%\response1.log
 echo.
+
+rem Verification step: Check the contents of output.txt
+set "expected_output=1 2 3"
+set "actual_output="
+if exist "output.txt" (
+    for /f "delims=" %%x in (output.txt) do set "actual_output=%%x"
+    if "!actual_output!"=="!expected_output!" (
+        echo Verification succeeded: output.txt contains the expected data.
+    ) else (
+        echo Verification failed: output.txt does not contain the expected data.
+        echo Expected: !expected_output!
+        echo Actual: !actual_output!
+        set "error_occurred=1"
+    )
+) else (
+    echo Verification failed: output.txt does not exist.
+    set "error_occurred=1"
+)
 
 echo ----------------------
 echo Server logs:
