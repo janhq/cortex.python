@@ -76,6 +76,7 @@ void PythonRuntimeEngine::HandlePythonFileExecutionRequestImpl(
       json_resp["message"] = "Failed to execute the Python file";
   } else {
     LOG_INFO << "Created child process for Python embedding";
+    WaitForSingleObject(pi.hProcess, INFINITE);
   }
 #else
   std::string child_process_exe_path = PythonRuntimeUtils::getCurrentExecutablePath();
