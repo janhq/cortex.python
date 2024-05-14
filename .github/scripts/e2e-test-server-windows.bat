@@ -26,7 +26,7 @@ set /a PORT=%min% + %RANDOM% %% %range%
 rem Start the binary file
 start /B "" "%BINARY_PATH%" "127.0.0.1" %PORT% > %TEMP%\server.log 2>&1
 
-ping -n 6 127.0.0.1 %PORT% > nul
+ping -n 6 127.0.0.1 > nul
 
 rem Capture the PID of the started process with "server" in its name
 for /f "tokens=2" %%a in ('tasklist /fi "imagename eq %BINARY_NAME%" /fo list ^| findstr /B "PID:"') do (
@@ -42,6 +42,7 @@ if not defined pid (
 )
 
 rem Wait for a few seconds to let the server start
+timeout /t 3 /nobreak >nul
 
 rem Define JSON strings for curl data
 call set "PYTHON_FILE_EXECUTION_PATH_STRING=%PYTHON_FILE_EXECUTION_PATH:\=\\%"
@@ -52,7 +53,6 @@ echo curl_data1=%curl_data1%
 
 rem Run the curl commands and capture the status code
 curl.exe --connect-timeout 60 -o "%TEMP%\response1.log" -s -w "%%{http_code}" --location "http://127.0.0.1:%PORT%/execute" --header "Content-Type: application/json" --data "%curl_data1%" > %TEMP%\response1.log 2>&1
-
 
 set "error_occurred=0"
 
@@ -65,21 +65,19 @@ if "%response1%" neq "200" (
     set "error_occurred=1"
 )
 
+rem Print the server logs regardless of success or failure
+echo ----------------------
+echo Server logs:
+type %TEMP%\server.log
+
 if "%error_occurred%"=="1" (
     echo Server test run failed!!!!!!!!!!!!!!!!!!!!!!
-    echo Server Error Logs:
-    type %TEMP%\server.log
     taskkill /f /pid %pid%
     echo An error occurred while running the server.
     exit /b 1
 )
 
-echo ----------------------
-echo Server logs:
-type %TEMP%\server.log
-
 echo Server test run successfully!
 
 rem Kill the server process
-@REM taskkill /f /pid %pid%
-taskkill /f /im server.exe 2>nul || exit /B 0
+taskkill /f /im %BINARY_NAME% 2>nul || exit /B 0
