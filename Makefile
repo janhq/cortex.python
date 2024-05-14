@@ -17,12 +17,20 @@ else  # Unix-like systems (Linux and MacOS)
 endif
 
 build-engine:
+ifeq ($(OS),Windows_NT)
+	cmd /C "mkdir build && cd build && cmake .. && cmake --build . --config Release -j12"
+else
 	mkdir -p build
 	cd build && cmake .. && cmake --build . --config Release -j12
+endif
 
 build-example-server:
+ifeq ($(OS),Windows_NT)
+	cmd /C "mkdir examples\\server\\build && cd examples\\server\\build && cmake .. && cmake --build . --config Release -j12"
+else
 	mkdir -p examples/server/build
 	cd examples/server/build && cmake .. && cmake --build . --config Release -j12
+endif
 
 package:
 ifeq ($(OS),Windows_NT)
@@ -39,7 +47,7 @@ ifeq ($(RUN_TESTS),false)
 else
 ifeq ($(OS),Windows_NT)
 	@mkdir -p examples\server\build\Release\engines\cortex.python-runtime && \
-	cmd /C "cd examples\server\build\Release && cp ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime && ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\$(PYTHON_FILE_EXECUTION_PATH);"
+	cmd /C "cd examples\server\build\Release && copy ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime && ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\$(PYTHON_FILE_EXECUTION_PATH)"
 else
 	@mkdir -p examples/server/build/engines/cortex.python-runtime && \
 	cd examples/server/build && \
@@ -49,4 +57,8 @@ endif
 endif
 
 clean:
+ifeq ($(OS),Windows_NT)
+	cmd /C "rmdir /S /Q build examples\\server\\build cortex.python-runtime cortex.python-runtime.tar.gz cortex.python-runtime.zip"
+else
 	rm -rf build examples/server/build cortex.python-runtime cortex.python-runtime.tar.gz cortex.python-runtime.zip
+endif

@@ -40,12 +40,10 @@ jobs:
       - name: Build engine 
         run: |
           make build-engine
-        shell: C:\Program Files\Git\bin\bash.exe
 
       - name: Build example server
         run: |
           make build-example-server
-        shell: C:\Program Files\Git\bin\bash.exe
 
       - name: Run e2e test
         run: |
