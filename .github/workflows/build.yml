@@ -40,10 +40,12 @@ jobs:
       - name: Build engine 
         run: |
           make build-engine
+        shell: bash
 
       - name: Build example server
         run: |
           make build-example-server
+        shell: bash
 
       - name: Run e2e test
         run: |
