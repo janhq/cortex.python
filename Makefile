@@ -1,7 +1,7 @@
 # Makefile for Cortex python-runtime engine - Build, Lint, Test, and Clean
 
 CMAKE_EXTRA_FLAGS ?= ""
-RUN_TESTS ?= false
+RUN_TESTS ?= true
 PYTHON_FILE_EXECUTION_PATH ?= ".github/scripts/python-file-to-test.py"
 
 # Default target, does nothing
@@ -9,32 +9,24 @@ all:
 	@echo "Specify a target to run"
 
 # Build the Cortex python-runtime engine
-build-lib:
+install-dependencies:
 ifeq ($(OS),Windows_NT) # Windows
-	@powershell -Command "cmake -S ./third-party -B ./build_deps/third-party;"
-	@powershell -Command "cmake --build ./build_deps/third-party --config Release -j8;"
-	@powershell -Command "mkdir -p build && cd build && cmake .. $(CMAKE_EXTRA_FLAGS) && cmake --build . --config Release;"
+	cmd /C install_deps.bat
 else  # Unix-like systems (Linux and MacOS)
-	@cmake -S ./third-party -B ./build_deps/third-party
-	@make -C ./build_deps/third-party -j8
-	# The following mkdir command will now work properly by changing to the directory only once.
-	@mkdir -p build && cd build && \
-	cmake .. $(CMAKE_EXTRA_FLAGS) && \
-	make -j8
+	bash ./install_deps.sh
 endif
 
-build-example-server: build-lib
-ifeq ($(OS),Windows_NT)
-	@powershell -Command "mkdir -p .\examples\server\build && cd .\examples\server\build && cmake .. $(CMAKE_EXTRA_FLAGS) && cmake --build . --config Release -j8;"
-else
-	@mkdir -p examples/server/build && cd examples/server/build && \
-	cmake .. $(CMAKE_EXTRA_FLAGS) && \
-	cmake --build . --config Release -j8
-endif
+build-engine:
+	mkdir -p build
+	cd build && cmake .. && cmake --build . --config Release -j12
+
+build-example-server:
+	mkdir -p examples/server/build
+	cd examples/server/build && cmake .. && cmake --build . --config Release -j12
 
 package:
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "mkdir -p cortex.python-runtime && cp build\Release\engine.dll cortex.python-runtime\ && 7z a -ttar temp.tar cortex.python-runtime\* && 7z a -tgzip cortex.python-runtime.tar.gz temp.tar;"
+	@powershell -Command "New-Item -ItemType Directory -Path cortex.python-runtime -Force; cp build\Release\engine.dll cortex.python-runtime\; Compress-Archive -Path cortex.python-runtime\* -DestinationPath cortex.python-runtime.zip;"
 else
 	@mkdir -p cortex.python-runtime && \
 	cp build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') cortex.python-runtime/ && \
@@ -46,7 +38,8 @@ ifeq ($(RUN_TESTS),false)
 	@echo "Skipping tests"
 else
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "mkdir -p examples\server\build\Release\engines\cortex.python-runtime && cd examples\server\build\Release && cp ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime && ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\$(PYTHON_FILE_EXECUTION_PATH);"
+	@mkdir -p examples\server\build\Release\engines\cortex.python-runtime && \
+	cmd /C "cd examples\server\build\Release && cp ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime && ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\$(PYTHON_FILE_EXECUTION_PATH);"
 else
 	@mkdir -p examples/server/build/engines/cortex.python-runtime && \
 	cd examples/server/build && \
@@ -55,3 +48,5 @@ else
 endif
 endif
 
+clean:
+	rm -rf build examples/server/build cortex.python-runtime cortex.python-runtime.tar.gz cortex.python-runtime.zip

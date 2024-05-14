@@ -28,54 +28,23 @@ jobs:
         id: checkout
         uses: actions/checkout@v3
 
-      - name: Install dependencies on Windows
+      - name: Install make on Windows
         if: runner.os == 'windows'
         run: |
           choco install make -y
-          .\install_deps.bat
 
-      - name: Install dependencies on Unix
-        if: runner.os != 'windows'
+      - name: Install dependencies
         run: |
-          bash ./install_deps.sh
+          make install-dependencies
 
       - name: Build engine 
         run: |
-          mkdir -p build
-          cd build
-          cmake ..
-          cmake --build . --config Release -j12
+          make build-engine
 
       - name: Build example server
         run: |
-          mkdir -p examples/server/build
-          cd examples/server/build
-          cmake ..
-          cmake --build . --config Release -j12
+          make build-example-server
 
-      - name: Run e2e test on Windows
-        if: runner.os == 'windows'
+      - name: Run e2e test
         run: |
-          mkdir -p examples\server\build\Release\engines\cortex.python-runtime 
-          cd examples\server\build\Release 
-          cp ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime 
-          ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ../../../.github/scripts/python-file-to-test.py
-
-      - name: Run e2e test on Linux
-        if: runner.os == 'linux'
-        run: |
-          mkdir -p examples/server/build/engines/cortex.python-runtime
-          cd examples/server/build/
-          cp ../../../build/libengine.so engines/cortex.python-runtime/
-          chmod +x ../../../.github/scripts/e2e-test-server-linux-and-mac.sh
-          ../../../.github/scripts/e2e-test-server-linux-and-mac.sh ./server ../../../.github/scripts/python-file-to-test.py
-
-      - name: Run e2e test on MacOS
-        if: runner.os == 'mac'
-        run: |
-          mkdir -p examples/server/build/engines/cortex.python-runtime
-          cd examples/server/build/
-          cp ../../../build/libengine.dylib engines/cortex.python-runtime/
-          chmod +x ../../../.github/scripts/e2e-test-server-linux-and-mac.sh
-          ../../../.github/scripts/e2e-test-server-linux-and-mac.sh ./server ../../../.github/scripts/python-file-to-test.py
-
+          make run-e2e-test
