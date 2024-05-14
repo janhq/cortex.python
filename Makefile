@@ -2,7 +2,7 @@
 
 CMAKE_EXTRA_FLAGS ?= ""
 RUN_TESTS ?= true
-PYTHON_FILE_EXECUTION_PATH ?= ".github/scripts/python-file-to-test.py"
+PYTHON_FILE_EXECUTION_PATH ?= .github/scripts/python-file-to-test.py
 
 # Default target, does nothing
 all:
@@ -47,7 +47,7 @@ ifeq ($(RUN_TESTS),false)
 else
 ifeq ($(OS),Windows_NT)
 	@mkdir -p examples\server\build\Release\engines\cortex.python-runtime && \
-	cmd /C "cd examples\server\build\Release && copy ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime && ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\..\$(PYTHON_FILE_EXECUTION_PATH)"
+	cmd /C "cd examples\server\build\Release && copy ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime && ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\..\\$(PYTHON_FILE_EXECUTION_PATH)"
 else
 	@mkdir -p examples/server/build/engines/cortex.python-runtime && \
 	cd examples/server/build && \
