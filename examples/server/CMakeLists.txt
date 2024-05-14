@@ -94,12 +94,6 @@ else() # APPLE and LINUX
   endforeach()
 endif()
 
-if(WIN32)
-  # dlfcn for dynamic library
-  find_package(dlfcn-win32 REQUIRED)
-  target_link_libraries(${PROJECT_NAME} PRIVATE dlfcn-win32::dl)
-endif()
-
 target_link_libraries(${PROJECT_NAME} PRIVATE ${JSONCPP} ${TRANTOR} ${LINKER_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../ ${THIRD_PARTY_PATH}/include/)

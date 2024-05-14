@@ -9,10 +9,10 @@ if [[ $# -ne 2 ]]; then
     exit 1
 fi
 
-rm /tmp/python-file-execution-res.log /tmp/server.log
-
 BINARY_PATH=$1
 PYTHON_FILE_EXECUTION_PATH=$2
+
+rm /tmp/python-file-execution-res.log /tmp/server.log
 
 # Random port to ensure it's not used
 min=10000
@@ -41,6 +41,7 @@ response1=$(curl --connect-timeout 60 -o /tmp/python-file-execution-res.log -s -
         "file_execution_path": "'$PYTHON_FILE_EXECUTION_PATH'"
     }')
 
+
 error_occurred=0
 if [[ "$response1" -ne 200 ]]; then
     echo "The python file execution curl command failed with status code: $response1"
@@ -57,7 +58,7 @@ if [[ "$error_occurred" -eq 1 ]]; then
 fi
 
 echo "----------------------"
-echo "Log python runtime:"
+echo "Log server:"
 cat /tmp/server.log
 
 

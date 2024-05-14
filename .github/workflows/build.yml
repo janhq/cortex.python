@@ -28,11 +28,54 @@ jobs:
         id: checkout
         uses: actions/checkout@v3
 
-      - name: Install choco on Windows
-        if: runner.os == 'Windows'
+      - name: Install dependencies on Windows
+        if: runner.os == 'windows'
         run: |
           choco install make -y
+          .\install_deps.bat
 
-      - name: Build
+      - name: Install dependencies on Unix
+        if: runner.os != 'windows'
         run: |
-          make hello-cortex
+          bash ./install_deps.sh
+
+      - name: Build engine 
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          cmake --build . --config Release -j12
+
+      - name: Build example server
+        run: |
+          mkdir -p examples/server/build
+          cd examples/server/build
+          cmake ..
+          cmake --build . --config Release -j12
+
+      - name: Run e2e test on Windows
+        if: runner.os == 'windows'
+        run: |
+          mkdir -p examples\server\build\Release\engines\cortex.python-runtime 
+          cd examples\server\build\Release 
+          cp ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime 
+          ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ../../../.github/scripts/python-file-to-test.py
+
+      - name: Run e2e test on Linux
+        if: runner.os == 'linux'
+        run: |
+          mkdir -p examples/server/build/engines/cortex.python-runtime
+          cd examples/server/build/
+          cp ../../../build/libengine.so engines/cortex.python-runtime/
+          chmod +x ../../../.github/scripts/e2e-test-server-linux-and-mac.sh
+          ../../../.github/scripts/e2e-test-server-linux-and-mac.sh ./server ../../../.github/scripts/python-file-to-test.py
+
+      - name: Run e2e test on MacOS
+        if: runner.os == 'mac'
+        run: |
+          mkdir -p examples/server/build/engines/cortex.python-runtime
+          cd examples/server/build/
+          cp ../../../build/libengine.dylib engines/cortex.python-runtime/
+          chmod +x ../../../.github/scripts/e2e-test-server-linux-and-mac.sh
+          ../../../.github/scripts/e2e-test-server-linux-and-mac.sh ./server ../../../.github/scripts/python-file-to-test.py
+

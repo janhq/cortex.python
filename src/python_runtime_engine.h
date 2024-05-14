@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "base/cortex-common/enginei.h"
-#include "jsoncpp/json/forwards.h"
+#include "json/forwards.h"
 #include "src/python_file_execution_request.h"
 
 class PythonRuntimeEngine : public EngineI {

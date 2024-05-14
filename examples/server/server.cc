@@ -8,7 +8,7 @@
 #include "dylib.h"
 #include "httplib.h"
 #include "json/reader.h"
-#include "jsoncpp/json/forwards.h"
+#include "json/forwards.h"
 #include "base/cortex-common/enginei.h"
 #include "trantor/utils/Logger.h"
 
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
   sigaction(SIGTERM, &sigint_action, NULL);
 #elif defined(_WIN32)
   auto console_ctrl_handler = +[](DWORD ctrl_type) -> BOOL {
-    return (ctrl_type == CTRL_C_EVENT) ? (signal_handler(SIGINT), true) : false;
+    return (ctrl_type == CTRL_C_EVENT) ? (SignalHandler(SIGINT), true) : false;
   };
   SetConsoleCtrlHandler(
       reinterpret_cast<PHANDLER_ROUTINE>(console_ctrl_handler), true);
