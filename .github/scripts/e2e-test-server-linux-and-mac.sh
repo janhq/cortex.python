@@ -54,6 +54,7 @@ if [[ "$error_occurred" -eq 1 ]]; then
     echo "Server Error Logs:"
     cat /tmp/server.log
     kill $pid
+    echo "An error occurred while running the server."
     exit 1
 fi
 
