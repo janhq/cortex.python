@@ -40,6 +40,7 @@ echo pid=%pid%
 if not defined pid (
     echo server failed to start. Logs:
     type %TEMP%\server.log
+    echo.
     exit /b 1
 )
 
@@ -53,7 +54,7 @@ rem Print the values of curl_data for debugging
 echo curl_data1=%curl_data1%
 
 rem Run the curl commands and capture the status code
-curl.exe --connect-timeout 60 -o "%TEMP%\response1.log" -s -w "%%{http_code}" --location "http://127.0.0.1:%PORT%/loadmodel" --header "Content-Type: application/json" --data "%curl_data1%" > %TEMP%\response1.log 2>&1
+curl.exe --connect-timeout 60 -o "%TEMP%\response1.log" -s -w "%%{http_code}" --location "http://127.0.0.1:%PORT%/execute" --header "Content-Type: application/json" --data "%curl_data1%" > %TEMP%\response1.log 2>&1
 
 set "error_occurred=0"
 
@@ -64,16 +65,19 @@ for /f %%a in (%TEMP%\response1.log) do set "response1=%%a"
 if "%response1%" neq "200" (
     echo The first curl command failed with status code: %response1%
     type %TEMP%\response1.log
+    echo.
     set "error_occurred=1"
 )
 
 echo ----------------------
 echo Log python file execution:
 type %TEMP%\response1.log
+echo.
 
 echo ----------------------
 echo Server logs:
 type %TEMP%\server.log
+echo.
 
 if "%error_occurred%"=="1" (
     echo Server test run failed!!!!!!!!!!!!!!!!!!!!!!
