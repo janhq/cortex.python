@@ -13,14 +13,14 @@ jobs:
       matrix:
         include:
           - os: "linux"
-            name: "ubuntu-1"
+            name: "ubuntu-18-04"
             runs-on: "ubuntu-18-04"
             # run-e2e: true
           - os: "mac"
-            name: "arm64-1"
+            name: "arm64"
             runs-on: "mac-silicon"
           - os: "windows"
-            name: "amd64-avx2-cuda-12-0"
+            name: "amd64"
             runs-on: "windows-cuda-12-0"
 
     steps:
