@@ -30,7 +30,7 @@ ifeq ($(OS),Windows_NT)
 else
 	mkdir -p examples/server/build
 	cd examples/server/build && cmake .. && cmake --build . --config Release -j12 && \
-	cp -r ../../../build/python/ ./ && cd python/lib && ln -s python3.10 python
+	cp -r ../../../build/python ./ && cd python/lib && ln -s python3.10 python
 endif
 
 package:
