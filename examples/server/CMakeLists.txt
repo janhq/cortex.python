@@ -58,42 +58,6 @@ find_library(TRANTOR
     HINTS "${THIRD_PARTY_PATH}/lib/"
 )
 
-# Copy the python3 related files to the build folder
-if (WIN32)
-  # Copy the whole library
-  file(COPY ${THIRD_PARTY_PATH}/python DESTINATION ${CMAKE_BINARY_DIR}/Release)
-else() # APPLE and LINUX
-  # Copy library files
-  file(GLOB PYTHON_LIBS ${THIRD_PARTY_PATH}/lib/python*)
-  if(PYTHON_LIBS)
-    list(GET PYTHON_LIBS 0 FIRST_PYTHON_LIB)
-    file(COPY ${FIRST_PYTHON_LIB} DESTINATION ${CMAKE_BINARY_DIR}/python/lib)
-  endif()
-
-  # Create symbolic link ".../lib/python" for target ".../lib/python3.*"
-  file(GLOB PYTHON_LIBS_DES ${CMAKE_BINARY_DIR}/python/lib/python*.*)
-  if(PYTHON_LIBS_DES)
-    list(GET PYTHON_LIBS_DES 0 FIRST_PYTHON_LIB)
-    set(SYMLINK_PATH ${CMAKE_BINARY_DIR}/python/lib/python)
-    if(EXISTS ${SYMLINK_PATH})
-        file(REMOVE_RECURSE ${SYMLINK_PATH})
-    endif()
-    file(CREATE_LINK ${FIRST_PYTHON_LIB} ${SYMLINK_PATH} SYMBOLIC)
-  endif()
-
-  # Copy executable files
-  file(GLOB PYTHON_EXECUTABLES ${THIRD_PARTY_PATH}/bin/python*)
-  foreach(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLES})
-      file(COPY ${PYTHON_EXECUTABLE} DESTINATION ${CMAKE_BINARY_DIR}/python/bin)
-  endforeach()
-
-  # Copy dynamic library files
-  file(GLOB PYTHON_DLS ${THIRD_PARTY_PATH}/lib/libpython*)
-  foreach(PYTHON_DL ${PYTHON_DLS})
-      file(COPY ${PYTHON_DL} DESTINATION ${CMAKE_BINARY_DIR}/python)
-  endforeach()
-endif()
-
 target_link_libraries(${PROJECT_NAME} PRIVATE ${JSONCPP} ${TRANTOR} ${LINKER_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../ ${THIRD_PARTY_PATH}/include/)
