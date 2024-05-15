@@ -24,6 +24,9 @@ ExternalProject_Add(
     	-DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
 )
 
+###############################
+# Install dependencies for engine
+
 # trantor for logging utils
 ExternalProject_Add(
     trantor
@@ -47,54 +50,59 @@ ExternalProject_Add(
     	-DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
 )
 
+###############################
+# Install dependencies for Python
 if(UNIX)
-# Download and install OpenSSL
-ExternalProject_Add(
-    OpenSSL
-    URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
-    PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR>
-    BUILD_COMMAND make -j8
-    INSTALL_COMMAND make install
-    BUILD_IN_SOURCE 1
-)
 
-# Download and install XZUtils
-ExternalProject_Add(
-    XZUtils
-    GIT_REPOSITORY https://github.com/tukaani-project/xz
-    GIT_TAG v5.4.6
-		CMAKE_ARGS
-			-DCMAKE_BUILD_TYPE=release
-			-DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
-			-DBUILD_SHARED_LIBS=OFF
-			-DBUILD_TESTS=OFF
-)
-endif()
+  # Download and install XZUtils
+  ExternalProject_Add(
+      XZUtils
+      GIT_REPOSITORY https://github.com/tukaani-project/xz
+      GIT_TAG v5.4.6
+      CMAKE_ARGS
+        -DCMAKE_BUILD_TYPE=release
+        -DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
+        -DBUILD_SHARED_LIBS=OFF
+        -DBUILD_TESTS=OFF
+  )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-# Download and install libffi
-ExternalProject_Add(
-    libffi
-    URL ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
-    URL_MD5 f5898b29bbfd70502831a212d9249d10
-    PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-shared
-    BUILD_COMMAND make -j8
-    INSTALL_COMMAND make install
-    BUILD_IN_SOURCE 1
-)
+  if(APPLE)
+    set(OPENSSL_CONFIG_COMMAND "./Configure")  
+  else()
+    set(OPENSSL_CONFIG_COMMAND "./config")  
+    # Download and install libffi
+    ExternalProject_Add(
+        libffi
+        URL ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
+        URL_MD5 f5898b29bbfd70502831a212d9249d10
+        PREFIX ${THIRD_PARTY_INSTALL_PATH}
+        CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-shared
+        BUILD_COMMAND make -j8
+        INSTALL_COMMAND make install
+        BUILD_IN_SOURCE 1
+    )
 
-ExternalProject_Add_Step(
-    libffi move_includes
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${THIRD_PARTY_INSTALL_PATH}/include
-    COMMAND ${CMAKE_COMMAND} -E copy_directory <INSTALL_DIR>/lib/libffi-3.1/include ${THIRD_PARTY_INSTALL_PATH}/include
-    DEPENDEES install
-    WORKING_DIRECTORY ${THIRD_PARTY_INSTALL_PATH}
-)
-endif()
+    ExternalProject_Add_Step(
+        libffi move_includes
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${THIRD_PARTY_INSTALL_PATH}/include
+        COMMAND ${CMAKE_COMMAND} -E copy_directory <INSTALL_DIR>/lib/libffi-3.1/include ${THIRD_PARTY_INSTALL_PATH}/include
+        DEPENDEES install
+        WORKING_DIRECTORY ${THIRD_PARTY_INSTALL_PATH}
+    )
+  endif()
 
-if(WIN32)
+  # Download and install OpenSSL
+    ExternalProject_Add(
+      OpenSSL
+      URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
+      PREFIX ${THIRD_PARTY_INSTALL_PATH}
+      CONFIGURE_COMMAND ${OPENSSL_CONFIG_COMMAND} --prefix=<INSTALL_DIR>
+      BUILD_COMMAND make -j8
+      INSTALL_COMMAND make install
+      BUILD_IN_SOURCE 1
+  )
+
+else() # WINDOWS
 	# Add dlfcn-win32 as an external project
 	ExternalProject_Add(
 		dlfcn-win32
@@ -108,6 +116,7 @@ if(WIN32)
   )
 endif()
 
+###############################
 # Install Python3 library
 if (UNIX) # APPLE and LINUX
   # Define Python installing configuration
