@@ -21,8 +21,8 @@ range=$((max - min + 1))
 PORT=$((RANDOM % range + min))
 
 # Install numpy for Python
-export LD_LIBRARY_PATH="$PYTHONHOME:$LD_LIBRARY_PATH"
 export PYTHONHOME=$(pwd)/python/
+export LD_LIBRARY_PATH="$PYTHONHOME:$LD_LIBRARY_PATH"
 echo $LD_LIBRARY_PATH
 ls -a ./python
 echo "Set Python HOME to $PYTHONHOME"
