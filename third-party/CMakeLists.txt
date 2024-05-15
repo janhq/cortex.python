@@ -67,7 +67,7 @@ if(UNIX)
   if(APPLE)
     set(OPENSSL_CONFIG_COMMAND "./Configure")  
   else()
-    set(OPENSSL_CONFIG_COMMAND "./config")  
+    set(OPENSSL_CONFIG_COMMAND "<SOURCE_DIR>/config")  
     # Download and install OpenSSL
     # ExternalProject_Add(
     #   OpenSSL
@@ -104,7 +104,7 @@ if(UNIX)
       OpenSSL
       URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
       PREFIX ${THIRD_PARTY_INSTALL_PATH}
-      CONFIGURE_COMMAND ${OPENSSL_CONFIG_COMMAND} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR>
+      CONFIGURE_COMMAND ${OPENSSL_CONFIG_COMMAND} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR> shared zlib
       BUILD_COMMAND make -j12
       INSTALL_COMMAND make install
       BUILD_IN_SOURCE 1
@@ -140,7 +140,7 @@ if (UNIX) # APPLE and LINUX
   else()
     set(PYTHON_INSTALL_CONFIG_HOST "")
     set(PYTHON_INSTALL_CONFIG_BUILD "")
-    set(PYTHON_INSTALL_CONFIG_SSL "--with-openssl-rpath=auto")
+    set(PYTHON_INSTALL_CONFIG_SSL "--with-openssl=<INSTALL_DIR>")
   endif()
 
   # Download and install Python3 from source
@@ -149,7 +149,7 @@ if (UNIX) # APPLE and LINUX
     DEPENDS OpenSSL
     URL https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
     PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL}
+    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL} --with-openssl-rpath=auto
     BUILD_COMMAND make -j12
     INSTALL_COMMAND make install
     BUILD_IN_SOURCE 1
