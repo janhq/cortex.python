@@ -65,9 +65,17 @@ if(UNIX)
       -DBUILD_TESTS=OFF
   )
   if(APPLE)
-    set(OPENSSL_CONFIG_COMMAND "./Configure")  
+    # Download and install OpenSSL
+    ExternalProject_Add(
+      OpenSSL
+      URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
+      PREFIX ${THIRD_PARTY_INSTALL_PATH}
+      CONFIGURE_COMMAND ./Configure --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR>
+      BUILD_COMMAND make -j12
+      INSTALL_COMMAND make install_sw
+      BUILD_IN_SOURCE 1
+    )
   else()
-    set(OPENSSL_CONFIG_COMMAND "./config")  
     # Download and install libffi
     ExternalProject_Add(
       libffi
@@ -89,16 +97,6 @@ if(UNIX)
     )
   endif()
 
-  # Download and install OpenSSL
-  ExternalProject_Add(
-    OpenSSL
-    URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
-    PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ${OPENSSL_CONFIG_COMMAND} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR>
-    BUILD_COMMAND make -j12
-    INSTALL_COMMAND make install_sw
-    BUILD_IN_SOURCE 1
-  )
 else() # WINDOWS
 	# Add dlfcn-win32 as an external project
 	ExternalProject_Add(
@@ -148,7 +146,7 @@ if (UNIX) # APPLE and LINUX
   if(APPLE)
     add_dependencies(Python3 zlib OpenSSL)
   else() # Linux
-    add_dependencies(Python3 zlib OpenSSL libffi)
+    add_dependencies(Python3 zlib libffi)
   endif()
 
 else() # WINDOWS
