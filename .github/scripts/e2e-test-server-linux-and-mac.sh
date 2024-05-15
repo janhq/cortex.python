@@ -23,6 +23,8 @@ PORT=$((RANDOM % range + min))
 # Install numpy for Python
 export LD_LIBRARY_PATH="$PYTHONHOME:$LD_LIBRARY_PATH"
 export PYTHONHOME=$(pwd)/python/
+echo $LD_LIBRARY_PATH
+ls -a ./python
 echo "Set Python HOME to $PYTHONHOME"
 ./python/bin/python3 -m ensurepip
 ./python/bin/python3 -m pip install --upgrade pip
