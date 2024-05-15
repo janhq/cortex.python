@@ -76,7 +76,6 @@ else() # APPLE and LINUX
 
     file(RELATIVE_PATH REL_PATH ${CMAKE_BINARY_DIR}/python/lib ${FIRST_PYTHON_LIB})
     file(CREATE_LINK ${REL_PATH} ${SYMLINK_PATH} SYMBOLIC)
-    # file(CREATE_LINK ${FIRST_PYTHON_LIB} ${SYMLINK_PATH} SYMBOLIC)
   endif()
 
   # Copy executable files

@@ -26,7 +26,7 @@ endif
 
 build-example-server:
 ifeq ($(OS),Windows_NT)
-	cmd /C "mkdir examples\\server\\build && cd examples\\server\\build && cmake .. && cmake --build . --config Release -j12"
+	cmd /C "mkdir examples\\server\\build && cd examples\\server\\build && cmake .. && cmake --build . --config Release -j12 && xcopy /E /I ..\\..\\..\\build\\python .\\Release\\python"
 else
 	mkdir -p examples/server/build
 	cd examples/server/build && cmake .. && cmake --build . --config Release -j12
