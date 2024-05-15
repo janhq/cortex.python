@@ -133,7 +133,6 @@ if (UNIX) # APPLE and LINUX
   # Download and install Python3 from source
   ExternalProject_Add(
     Python3
-    DEPENDS zlib OpenSSL
     URL https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
     PREFIX ${THIRD_PARTY_INSTALL_PATH}
     CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL}
