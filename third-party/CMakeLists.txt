@@ -53,41 +53,39 @@ ExternalProject_Add(
 ###############################
 # Install dependencies for Python
 if(UNIX)
-
   # Download and install XZUtils
   ExternalProject_Add(
-      XZUtils
-      GIT_REPOSITORY https://github.com/tukaani-project/xz
-      GIT_TAG v5.4.6
-      CMAKE_ARGS
-        -DCMAKE_BUILD_TYPE=release
-        -DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
-        -DBUILD_SHARED_LIBS=OFF
-        -DBUILD_TESTS=OFF
+    zlib
+    GIT_REPOSITORY https://github.com/madler/zlib
+    GIT_TAG v1.3.1
+    CMAKE_ARGS
+      -DCMAKE_BUILD_TYPE=release
+      -DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_TESTS=OFF
   )
-
   if(APPLE)
     set(OPENSSL_CONFIG_COMMAND "./Configure")  
   else()
     set(OPENSSL_CONFIG_COMMAND "./config")  
     # Download and install libffi
     ExternalProject_Add(
-        libffi
-        URL ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
-        URL_MD5 f5898b29bbfd70502831a212d9249d10
-        PREFIX ${THIRD_PARTY_INSTALL_PATH}
-        CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-shared
-        BUILD_COMMAND make -j8
-        INSTALL_COMMAND make install
-        BUILD_IN_SOURCE 1
+      libffi
+      URL ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
+      URL_MD5 f5898b29bbfd70502831a212d9249d10
+      PREFIX ${THIRD_PARTY_INSTALL_PATH}
+      CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-shared
+      BUILD_COMMAND make -j12
+      INSTALL_COMMAND make install
+      BUILD_IN_SOURCE 1
     )
 
     ExternalProject_Add_Step(
-        libffi move_includes
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${THIRD_PARTY_INSTALL_PATH}/include
-        COMMAND ${CMAKE_COMMAND} -E copy_directory <INSTALL_DIR>/lib/libffi-3.1/include ${THIRD_PARTY_INSTALL_PATH}/include
-        DEPENDEES install
-        WORKING_DIRECTORY ${THIRD_PARTY_INSTALL_PATH}
+      libffi move_includes
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${THIRD_PARTY_INSTALL_PATH}/include
+      COMMAND ${CMAKE_COMMAND} -E copy_directory <INSTALL_DIR>/lib/libffi-3.1/include ${THIRD_PARTY_INSTALL_PATH}/include
+      DEPENDEES install
+      WORKING_DIRECTORY ${THIRD_PARTY_INSTALL_PATH}
     )
   endif()
 
@@ -146,9 +144,9 @@ if (UNIX) # APPLE and LINUX
 
   # Add dependencies for Python3
   if(APPLE)
-    add_dependencies(Python3 XZUtils OpenSSL)
+    add_dependencies(Python3 zlib OpenSSL)
   else() # Linux
-    add_dependencies(Python3 XZUtils OpenSSL libffi)
+    add_dependencies(Python3 zlib OpenSSL libffi)
   endif()
 
 else() # WINDOWS
