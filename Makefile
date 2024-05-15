@@ -29,8 +29,8 @@ ifeq ($(OS),Windows_NT)
 	cmd /C "mkdir examples\\server\\build && cd examples\\server\\build && cmake .. && cmake --build . --config Release -j12"
 else
 	mkdir -p examples/server/build
-	cd examples/server/build && cmake .. && cmake --build . --config Release -j12
-	cp -r build/python/ examples/server/build/ && cd examples/server/build/python/lib && ln -s python3.10 python
+	cd examples/server/build && cmake .. && cmake --build . --config Release -j12 && \
+	cp -r ../../../build/python/ ./ && cd python/lib && ln -s python3.10 python
 endif
 
 package:
