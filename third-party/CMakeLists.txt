@@ -47,7 +47,7 @@ ExternalProject_Add(
     	-DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
 )
 
-if(APPLE)
+if(UNIX)
 # Download and install OpenSSL
 ExternalProject_Add(
     OpenSSL
@@ -119,11 +119,9 @@ if (UNIX) # APPLE and LINUX
       set(PYTHON_INSTALL_CONFIG_HOST "--host=x86_64-apple-darwin")
       set(PYTHON_INSTALL_CONFIG_BUILD "--build=x86_64-apple-darwin")
     endif()
-    set(PYTHON_INSTALL_CONFIG_SSL "--with-openssl=${THIRD_PARTY_INSTALL_PATH}")
   else()
     set(PYTHON_INSTALL_CONFIG_HOST "")
     set(PYTHON_INSTALL_CONFIG_BUILD "")
-    set(PYTHON_INSTALL_CONFIG_SSL "")
   endif()
 
   # Download and install Python3 from source
@@ -131,7 +129,7 @@ if (UNIX) # APPLE and LINUX
     Python3
     URL https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
     PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL}
+    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} --with-openssl=${THIRD_PARTY_INSTALL_PATH}
     BUILD_COMMAND make -j12
     INSTALL_COMMAND make install
     BUILD_IN_SOURCE 1
@@ -141,7 +139,7 @@ if (UNIX) # APPLE and LINUX
   if(APPLE)
     add_dependencies(Python3 XZUtils OpenSSL)
   else() # Linux
-    add_dependencies(Python3 libffi)
+    add_dependencies(Python3 XZUtils OpenSSL libffi)
   endif()
 
 else() # WINDOWS
