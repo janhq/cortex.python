@@ -65,16 +65,19 @@ else() # APPLE and LINUX
     file(COPY ${FIRST_PYTHON_LIB} DESTINATION ${CMAKE_BINARY_DIR}/python/lib)
   endif()
 
-  # # Create symbolic link ".../lib/python" for target ".../lib/python3.*"
-  # file(GLOB PYTHON_LIBS_DES ${CMAKE_BINARY_DIR}/python/lib/python*.*)
-  # if(PYTHON_LIBS_DES)
-  #   list(GET PYTHON_LIBS_DES 0 FIRST_PYTHON_LIB)
-  #   set(SYMLINK_PATH ${CMAKE_BINARY_DIR}/python/lib/python)
-  #   if(EXISTS ${SYMLINK_PATH})
-  #       file(REMOVE_RECURSE ${SYMLINK_PATH})
-  #   endif()
-  #   file(CREATE_LINK ${FIRST_PYTHON_LIB} ${SYMLINK_PATH} SYMBOLIC)
-  # endif()
+  # Create symbolic link ".../lib/python" for target ".../lib/python3.*"
+  file(GLOB PYTHON_LIBS_DES ${CMAKE_BINARY_DIR}/python/lib/python*.*)
+  if(PYTHON_LIBS_DES)
+    list(GET PYTHON_LIBS_DES 0 FIRST_PYTHON_LIB)
+    set(SYMLINK_PATH ${CMAKE_BINARY_DIR}/python/lib/python)
+    if(EXISTS ${SYMLINK_PATH})
+        file(REMOVE_RECURSE ${SYMLINK_PATH})
+    endif()
+
+    file(RELATIVE_PATH REL_PATH ${CMAKE_BINARY_DIR}/python/lib ${FIRST_PYTHON_LIB})
+    file(CREATE_LINK ${REL_PATH} ${SYMLINK_PATH} SYMBOLIC)
+    # file(CREATE_LINK ${FIRST_PYTHON_LIB} ${SYMLINK_PATH} SYMBOLIC)
+  endif()
 
   # Copy executable files
   file(GLOB PYTHON_EXECUTABLES ${THIRD_PARTY_PATH}/bin/python*)
