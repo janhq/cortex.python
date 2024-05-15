@@ -65,17 +65,19 @@ if(UNIX)
       -DBUILD_TESTS=OFF
   )
   if(APPLE)
-    # Download and install OpenSSL
-    ExternalProject_Add(
-      OpenSSL
-      URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
-      PREFIX ${THIRD_PARTY_INSTALL_PATH}
-      CONFIGURE_COMMAND ./Configure --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR>
-      BUILD_COMMAND make -j12
-      INSTALL_COMMAND make install_sw
-      BUILD_IN_SOURCE 1
-    )
+    set(OPENSSL_CONFIG_COMMAND "./Configure")  
   else()
+    set(OPENSSL_CONFIG_COMMAND "./config")  
+    # Download and install OpenSSL
+    # ExternalProject_Add(
+    #   OpenSSL
+    #   URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
+    #   PREFIX ${THIRD_PARTY_INSTALL_PATH}
+    #   CONFIGURE_COMMAND ./Configure --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR>
+    #   BUILD_COMMAND make -j12
+    #   INSTALL_COMMAND make install_sw
+    #   BUILD_IN_SOURCE 1
+    # )
     # Download and install libffi
     ExternalProject_Add(
       libffi
@@ -96,6 +98,17 @@ if(UNIX)
       WORKING_DIRECTORY ${THIRD_PARTY_INSTALL_PATH}
     )
   endif()
+
+  # OpenSSL external project
+  ExternalProject_Add(
+      OpenSSL
+      URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
+      PREFIX ${THIRD_PARTY_INSTALL_PATH}/openssl
+      CONFIGURE_COMMAND ${OPENSSL_CONFIG_COMMAND} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR>
+      BUILD_COMMAND make -j12
+      INSTALL_COMMAND make install
+      BUILD_IN_SOURCE 1
+  )
 
 else() # WINDOWS
 	# Add dlfcn-win32 as an external project
@@ -133,9 +146,10 @@ if (UNIX) # APPLE and LINUX
   # Download and install Python3 from source
   ExternalProject_Add(
     Python3
+    DEPENDS OpenSSL
     URL https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
     PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL}
+    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} --with-openssl=PREFIX ${THIRD_PARTY_INSTALL_PATH}/openssl
     BUILD_COMMAND make -j12
     INSTALL_COMMAND make install
     BUILD_IN_SOURCE 1
