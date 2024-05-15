@@ -35,10 +35,11 @@ endif
 
 package:
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "New-Item -ItemType Directory -Path cortex.python-runtime -Force; cp build\Release\engine.dll cortex.python-runtime\; Compress-Archive -Path cortex.python-runtime\* -DestinationPath cortex.python-runtime.zip;"
+	@powershell -Command "New-Item -ItemType Directory -Path cortex.python-runtime -Force; cp build\Release\engine.dll cortex.python-runtime\; cp -r build\Release\python cortex.python-runtime; Compress-Archive -Path cortex.python-runtime\* -DestinationPath cortex.python-runtime.zip;"
 else
 	@mkdir -p cortex.python-runtime && \
-	cp build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') cortex.python-runtime/ && \
+	cp build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') cortex.python-runtime && \
+	cp -r build/python cortex.python-runtime
 	tar -czvf cortex.python-runtime.tar.gz cortex.python-runtime
 endif
 
