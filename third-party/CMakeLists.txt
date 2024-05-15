@@ -104,7 +104,7 @@ if(UNIX)
       OpenSSL
       URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
       PREFIX ${THIRD_PARTY_INSTALL_PATH}
-      CONFIGURE_COMMAND ${OPENSSL_CONFIG_COMMAND} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR> shared zlib
+      CONFIGURE_COMMAND ${OPENSSL_CONFIG_COMMAND} --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR>
       BUILD_COMMAND make -j12
       INSTALL_COMMAND make install
       BUILD_IN_SOURCE 1
@@ -159,7 +159,7 @@ if (UNIX) # APPLE and LINUX
   if(APPLE)
     add_dependencies(Python3 zlib OpenSSL)
   else() # Linux
-    add_dependencies(Python3 zlib libffi)
+    add_dependencies(Python3 zlib OpenSSL libffi)
   endif()
 
 else() # WINDOWS
