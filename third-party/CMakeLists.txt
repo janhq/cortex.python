@@ -63,7 +63,7 @@ if(UNIX)
       -DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
       -DBUILD_SHARED_LIBS=OFF
       -DBUILD_TESTS=OFF
-  )
+)
   if(APPLE)
     # Download and install OpenSSL
     ExternalProject_Add(
@@ -125,10 +125,12 @@ if (UNIX) # APPLE and LINUX
       set(PYTHON_INSTALL_CONFIG_BUILD "--build=x86_64-apple-darwin")
     endif()
     set(PYTHON_INSTALL_CONFIG_SSL "--with-openssl=${THIRD_PARTY_INSTALL_PATH}")
+    set(PYTHON_INSTALL_CONFIG_ZLIB "--with-zlib=${THIRD_PARTY_INSTALL_PATH}")
   else()
     set(PYTHON_INSTALL_CONFIG_HOST "")
     set(PYTHON_INSTALL_CONFIG_BUILD "")
-    set(PYTHON_INSTALL_CONFIG_SSL "--with-openssl-rpath=auto")
+    set(PYTHON_INSTALL_CONFIG_SSL "")
+    set(PYTHON_INSTALL_CONFIG_ZLIB "")
   endif()
 
   # Download and install Python3 from source
@@ -136,7 +138,7 @@ if (UNIX) # APPLE and LINUX
     Python3
     URL https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
     PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL}
+    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL} ${PYTHON_INSTALL_CONFIG_ZLIB} --with-openssl-rpath=auto
     BUILD_COMMAND make -j12
     INSTALL_COMMAND make install
     BUILD_IN_SOURCE 1
@@ -155,9 +157,9 @@ else() # WINDOWS
     PREFIX "${CMAKE_BINARY_DIR}/python"
     URL "https://www.python.org/ftp/python/3.10.4/python-3.10.4-amd64.exe"
     DOWNLOAD_NO_EXTRACT 1
-    CONFIGURE_COMMAND ""  # No configure command
-    BUILD_COMMAND ""  # No build command
-    INSTALL_COMMAND ""  # No install command
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
   )
 
   # Download and install from binary
