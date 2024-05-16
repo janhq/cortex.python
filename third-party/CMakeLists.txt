@@ -11,6 +11,9 @@ set(THIRD_PARTY_INSTALL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../build_deps/_install)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC")
   add_compile_options(-fPIC)
+
+  set(CMAKE_INSTALL_RPATH "${THIRD_PARTY_INSTALL_PATH}")
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif()
 
 ExternalProject_Add(

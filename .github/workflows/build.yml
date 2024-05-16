@@ -71,4 +71,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cortex.python-runtime-${{ matrix.os }}-${{ matrix.name }}
-          path: ./cortex.python-runtime
+          path: ./cortex.python-runtime.tar.gz
