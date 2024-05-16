@@ -35,7 +35,7 @@ endif
 
 package:
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "New-Item -ItemType Directory -Path cortex.python-runtime -Force; cp build\\Release\\engine.dll cortex.python-runtime\\; cp -r build\\Release\\python cortex.python-runtime; Compress-Archive -Path cortex.python-runtime\\* -DestinationPath cortex.python-runtime.zip;"
+	@powershell -Command "mkdir -p cortex.python-runtime; cp build\Release\engine.dll cortex.python-runtime\; cp -r build\Release\python cortex.python-runtime\; 7z a -ttar temp.tar cortex.python-runtime\*; 7z a -tgzip cortex.python-runtime.tar.gz temp.tar;"
 else
 	@mkdir -p cortex.python-runtime && \
 	cp build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') cortex.python-runtime && \
