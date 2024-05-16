@@ -53,15 +53,16 @@ ExternalProject_Add(
 ###############################
 # Install dependencies for Python
 if(UNIX)
-  # Download and install XZUtils
+  # Download and install XZUtils for zlib
   ExternalProject_Add(
-    zlib
-    URL https://zlib.net/zlib-1.2.11.tar.gz
-    PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR>
-    BUILD_COMMAND make -j12
-    INSTALL_COMMAND make install
-    BUILD_IN_SOURCE 1
+      XZUtils
+      GIT_REPOSITORY https://github.com/tukaani-project/xz
+      GIT_TAG v5.4.6
+      CMAKE_ARGS
+        -DCMAKE_BUILD_TYPE=release
+        -DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
+        -DBUILD_SHARED_LIBS=OFF
+        -DBUILD_TESTS=OFF
   )
   if(APPLE)
     # Download and install OpenSSL
@@ -137,7 +138,7 @@ if (UNIX) # APPLE and LINUX
     Python3
     URL https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
     PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL} ${PYTHON_INSTALL_CONFIG_ZLIB} --with-openssl-rpath=auto
+    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL} --with-openssl-rpath=auto
     BUILD_COMMAND make -j12
     INSTALL_COMMAND make install
     BUILD_IN_SOURCE 1
@@ -145,9 +146,9 @@ if (UNIX) # APPLE and LINUX
 
   # Add dependencies for Python3
   if(APPLE)
-    add_dependencies(Python3 zlib OpenSSL)
+    add_dependencies(Python3 XZUtils OpenSSL)
   else() # Linux
-    add_dependencies(Python3 zlib libffi)
+    add_dependencies(Python3 XZUtils libffi)
   endif()
 
 else() # WINDOWS
