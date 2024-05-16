@@ -56,14 +56,13 @@ if(UNIX)
   # Download and install XZUtils
   ExternalProject_Add(
     zlib
-    GIT_REPOSITORY https://github.com/madler/zlib
-    GIT_TAG v1.3.1
-    CMAKE_ARGS
-      -DCMAKE_BUILD_TYPE=release
-      -DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
-      -DBUILD_SHARED_LIBS=OFF
-      -DBUILD_TESTS=OFF
-)
+    URL https://zlib.net/zlib-1.2.11.tar.gz
+    PREFIX ${THIRD_PARTY_INSTALL_PATH}
+    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR>
+    BUILD_COMMAND make -j12
+    INSTALL_COMMAND make install
+    BUILD_IN_SOURCE 1
+  )
   if(APPLE)
     # Download and install OpenSSL
     ExternalProject_Add(
@@ -72,7 +71,7 @@ if(UNIX)
       PREFIX ${THIRD_PARTY_INSTALL_PATH}
       CONFIGURE_COMMAND ./Configure --prefix=<INSTALL_DIR> --openssldir=<INSTALL_DIR>
       BUILD_COMMAND make -j12
-      INSTALL_COMMAND make install_sw
+      INSTALL_COMMAND make install
       BUILD_IN_SOURCE 1
     )
     

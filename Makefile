@@ -35,7 +35,7 @@ endif
 
 package:
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "New-Item -ItemType Directory -Path cortex.python-runtime -Force; cp build\Release\engine.dll cortex.python-runtime\; cp -r build\Release\python cortex.python-runtime; Compress-Archive -Path cortex.python-runtime\* -DestinationPath cortex.python-runtime.zip;"
+	@powershell -Command "New-Item -ItemType Directory -Path cortex.python-runtime -Force; cp build\\Release\\engine.dll cortex.python-runtime\\; cp -r build\\Release\\python cortex.python-runtime; Compress-Archive -Path cortex.python-runtime\\* -DestinationPath cortex.python-runtime.zip;"
 else
 	@mkdir -p cortex.python-runtime && \
 	cp build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') cortex.python-runtime && \
@@ -48,8 +48,8 @@ ifeq ($(RUN_TESTS),false)
 	@echo "Skipping tests"
 else
 ifeq ($(OS),Windows_NT)
-	@mkdir examples\server\build\Release\engines\cortex.python-runtime && \
-	cmd /C "cd examples\server\build\Release && copy ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime && ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\..\\$(PYTHON_FILE_EXECUTION_PATH)"
+	@mkdir examples\\server\\build\\Release\\engines\\cortex.python-runtime && \
+	cmd /C "cd examples\\server\\build\\Release && copy ..\\..\\..\\..\\build\\Release\\engine.dll engines\\cortex.python-runtime && ..\\..\\..\\..\\.github\\scripts\\e2e-test-server-windows.bat server.exe ..\\..\\..\\..\\$(PYTHON_FILE_EXECUTION_PATH)"
 else
 	@mkdir -p examples/server/build/engines/cortex.python-runtime && \
 	cd examples/server/build && \
