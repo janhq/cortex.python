@@ -18,7 +18,7 @@ endif
 
 build-engine:
 ifeq ($(OS),Windows_NT)
-	cmd /C "mkdir build && cd build && cmake .. && cmake --build . --config Release -j12"
+	@powershell -Command "mkdir -p build; cd build; cmake .. $(CMAKE_EXTRA_FLAGS); cmake --build . --config Release;"
 else
 	mkdir -p build
 	cd build && cmake .. && cmake --build . --config Release -j12
