@@ -26,7 +26,7 @@ endif
 
 build-example-server:
 ifeq ($(OS),Windows_NT)
-	cmd /C "mkdir examples\\server\\build && cd examples\\server\\build && cmake .. && cmake --build . --config Release -j12 && xcopy /E /I ..\\..\\..\\build\\python .\\Release\\python"
+	@powershell -Command "mkdir -p .\examples\server\build; cd .\examples\server\build; cmake .. $(CMAKE_EXTRA_FLAGS); cmake --build . --config Release; cp -r ..\..\..\build\python .\Release\python"
 else
 	mkdir -p examples/server/build
 	cd examples/server/build && cmake .. && cmake --build . --config Release -j12
@@ -35,7 +35,7 @@ endif
 
 package:
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "mkdir -p cortex.python-runtime; cp build\Release\engine.dll cortex.python-runtime\; cp -r build\Release\python cortex.python-runtime\; 7z a -ttar temp.tar cortex.python-runtime\*; 7z a -tgzip cortex.python-runtime.tar.gz temp.tar;"
+	@powershell -Command "mkdir -p cortex.python-runtime; cp build\Release\engine.dll cortex.python-runtime\; cp -r build\python cortex.python-runtime\; 7z a -ttar temp.tar cortex.python-runtime\*; 7z a -tgzip cortex.python-runtime.tar.gz temp.tar;"
 else
 	@mkdir -p cortex.python-runtime && \
 	cp build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') cortex.python-runtime && \
