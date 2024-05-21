@@ -24,9 +24,9 @@ PORT=$((RANDOM % range + min))
 export PYTHONHOME=$(pwd)/engines/cortex.python/python/
 export LD_LIBRARY_PATH="$PYTHONHOME:$LD_LIBRARY_PATH"
 echo "Set Python HOME to $PYTHONHOME"
-./python/bin/python3 -m ensurepip
-./python/bin/python3 -m pip install --upgrade pip
-./python/bin/python3 -m pip install numpy --target=$PYTHONHOME/lib/python/site-packages/
+./engines/cortex.python/python/bin/python3 -m ensurepip
+./engines/cortex.python/python/bin/python3 -m pip install --upgrade pip
+./engines/cortex.python/python/bin/python3 -m pip install numpy --target=$PYTHONHOME/lib/python/site-packages/
 
 # Start the binary file
 "$BINARY_PATH" 127.0.0.1 $PORT >/tmp/server.log &
