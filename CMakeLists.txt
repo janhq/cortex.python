@@ -56,7 +56,7 @@ find_library(TRANTOR
 # Copy the python3 related files to the build folder
 if (WIN32)
   # Copy the whole library
-  file(COPY ${THIRD_PARTY_PATH}/python DESTINATION ${CMAKE_BINARY_DIR}/Release)
+  file(COPY ${THIRD_PARTY_PATH}/python DESTINATION ${CMAKE_BINARY_DIR})
 else() # APPLE and LINUX
   # Copy library files
   file(GLOB PYTHON_LIBS ${THIRD_PARTY_PATH}/lib/python*)
@@ -73,7 +73,9 @@ else() # APPLE and LINUX
     if(EXISTS ${SYMLINK_PATH})
         file(REMOVE_RECURSE ${SYMLINK_PATH})
     endif()
-    file(CREATE_LINK ${FIRST_PYTHON_LIB} ${SYMLINK_PATH} SYMBOLIC)
+
+    file(RELATIVE_PATH REL_PATH ${CMAKE_BINARY_DIR}/python/lib ${FIRST_PYTHON_LIB})
+    file(CREATE_LINK ${REL_PATH} ${SYMLINK_PATH} SYMBOLIC)
   endif()
 
   # Copy executable files

@@ -20,6 +20,14 @@ max=11000
 range=$((max - min + 1))
 PORT=$((RANDOM % range + min))
 
+# Install numpy for Python
+export PYTHONHOME=$(pwd)/python/
+export LD_LIBRARY_PATH="$PYTHONHOME:$LD_LIBRARY_PATH"
+echo "Set Python HOME to $PYTHONHOME"
+./python/bin/python3 -m ensurepip
+./python/bin/python3 -m pip install --upgrade pip
+./python/bin/python3 -m pip install numpy --target=$PYTHONHOME/lib/python/site-packages/
+
 # Start the binary file
 "$BINARY_PATH" 127.0.0.1 $PORT >/tmp/server.log &
 
@@ -41,13 +49,34 @@ response1=$(curl --connect-timeout 60 -o /tmp/python-file-execution-res.log -s -
         "file_execution_path": "'$PYTHON_FILE_EXECUTION_PATH'"
     }')
 
-
 error_occurred=0
+
+# Verify the response
 if [[ "$response1" -ne 200 ]]; then
     echo "The python file execution curl command failed with status code: $response1"
     cat /tmp/python-file-execution-res.log
     error_occurred=1
 fi
+
+# Verify the output of the Python file in output.txt
+OUTPUT_FILE="./output.txt"
+EXPECTED_OUTPUT="1 2 3"  # Replace with the expected content
+
+if [[ -f "$OUTPUT_FILE" ]]; then
+    actual_output=$(cat "$OUTPUT_FILE")
+    if [[ "$actual_output" != "$EXPECTED_OUTPUT" ]]; then
+        echo "The output of the Python file does not match the expected output."
+        echo "Expected: $EXPECTED_OUTPUT"
+        echo "Actual: $actual_output"
+        error_occurred=1
+    else
+        echo "The output of the Python file matches the expected output."
+    fi
+else
+    echo "Output file $OUTPUT_FILE does not exist."
+    error_occurred=1
+fi
+
 
 if [[ "$error_occurred" -eq 1 ]]; then
     echo "Server test run failed!!!!!!!!!!!!!!!!!!!!!!"
@@ -61,7 +90,6 @@ fi
 echo "----------------------"
 echo "Log server:"
 cat /tmp/server.log
-
 
 echo "Server test run successfully!"
 

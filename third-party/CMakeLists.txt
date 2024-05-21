@@ -11,6 +11,9 @@ set(THIRD_PARTY_INSTALL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../build_deps/_install)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC")
   add_compile_options(-fPIC)
+
+  set(CMAKE_INSTALL_RPATH "${THIRD_PARTY_INSTALL_PATH}")
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif()
 
 ExternalProject_Add(
@@ -47,53 +50,6 @@ ExternalProject_Add(
     	-DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
 )
 
-if(APPLE)
-# Download and install OpenSSL
-ExternalProject_Add(
-    OpenSSL
-    URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
-    PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR>
-    BUILD_COMMAND make -j8
-    INSTALL_COMMAND make install
-    BUILD_IN_SOURCE 1
-)
-
-# Download and install XZUtils
-ExternalProject_Add(
-    XZUtils
-    GIT_REPOSITORY https://github.com/tukaani-project/xz
-    GIT_TAG v5.4.6
-		CMAKE_ARGS
-			-DCMAKE_BUILD_TYPE=release
-			-DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
-			-DBUILD_SHARED_LIBS=OFF
-			-DBUILD_TESTS=OFF
-)
-endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-# Download and install libffi
-ExternalProject_Add(
-    libffi
-    URL ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
-    URL_MD5 f5898b29bbfd70502831a212d9249d10
-    PREFIX ${THIRD_PARTY_INSTALL_PATH}
-    CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-shared
-    BUILD_COMMAND make -j8
-    INSTALL_COMMAND make install
-    BUILD_IN_SOURCE 1
-)
-
-ExternalProject_Add_Step(
-    libffi move_includes
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${THIRD_PARTY_INSTALL_PATH}/include
-    COMMAND ${CMAKE_COMMAND} -E copy_directory <INSTALL_DIR>/lib/libffi-3.1/include ${THIRD_PARTY_INSTALL_PATH}/include
-    DEPENDEES install
-    WORKING_DIRECTORY ${THIRD_PARTY_INSTALL_PATH}
-)
-endif()
-
 if(WIN32)
 	# Add dlfcn-win32 as an external project
 	ExternalProject_Add(
@@ -108,6 +64,66 @@ if(WIN32)
   )
 endif()
 
+###############################
+# Install Python3 dependencies
+if(APPLE)
+  # Download and install OpenSSL
+  ExternalProject_Add(
+      OpenSSL
+      URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
+      PREFIX ${THIRD_PARTY_INSTALL_PATH}
+      CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR>
+      BUILD_COMMAND make -j8
+      INSTALL_COMMAND make install
+      BUILD_IN_SOURCE 1
+  )
+
+  # Download and install XZUtils
+  ExternalProject_Add(
+      XZUtils
+      GIT_REPOSITORY https://github.com/tukaani-project/xz
+      GIT_TAG v5.4.6
+      CMAKE_ARGS
+        -DCMAKE_BUILD_TYPE=release
+        -DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
+        -DBUILD_SHARED_LIBS=OFF
+        -DBUILD_TESTS=OFF
+  )
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  # Download and install zlib
+  ExternalProject_Add(
+    zlib
+    GIT_REPOSITORY https://github.com/madler/zlib
+    GIT_TAG v1.3.1
+    CMAKE_ARGS
+      -DCMAKE_BUILD_TYPE=release
+      -DCMAKE_INSTALL_PREFIX=${THIRD_PARTY_INSTALL_PATH}
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_TESTS=OFF
+  )
+  # Download and install libffi
+  ExternalProject_Add(
+      libffi
+      URL ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
+      URL_MD5 f5898b29bbfd70502831a212d9249d10
+      PREFIX ${THIRD_PARTY_INSTALL_PATH}
+      CONFIGURE_COMMAND ./configure --prefix=<INSTALL_DIR> --enable-shared
+      BUILD_COMMAND make -j8
+      INSTALL_COMMAND make install
+      BUILD_IN_SOURCE 1
+  )
+  ExternalProject_Add_Step(
+      libffi move_includes
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${THIRD_PARTY_INSTALL_PATH}/include
+      COMMAND ${CMAKE_COMMAND} -E copy_directory <INSTALL_DIR>/lib/libffi-3.1/include ${THIRD_PARTY_INSTALL_PATH}/include
+      DEPENDEES install
+      WORKING_DIRECTORY ${THIRD_PARTY_INSTALL_PATH}
+  )
+endif()
+
+###############################
 # Install Python3 library
 if (UNIX) # APPLE and LINUX
   # Define Python installing configuration
@@ -141,7 +157,7 @@ if (UNIX) # APPLE and LINUX
   if(APPLE)
     add_dependencies(Python3 XZUtils OpenSSL)
   else() # Linux
-    add_dependencies(Python3 libffi)
+    add_dependencies(Python3 zlib libffi)
   endif()
 
 else() # WINDOWS
