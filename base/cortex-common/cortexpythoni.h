@@ -9,6 +9,13 @@ class CortexPythonEngineI {
  public:
   virtual ~CortexPythonEngineI() {}
 
+  virtual bool IsSupported(const std::string& f) {
+    if (f == "ExecutePythonFile" || f == "HandlePythonFileExecutionRequest") {
+      return true;
+    }
+    return false;
+  }
+
   virtual void ExecutePythonFile(std::string binary_execute_path,
                                  std::string file_execution_path,
                                  std::string python_library_path) = 0;
@@ -16,11 +23,4 @@ class CortexPythonEngineI {
   virtual void HandlePythonFileExecutionRequest(
       std::shared_ptr<Json::Value> json_body,
       std::function<void(Json::Value&&, Json::Value&&)>&& callback) = 0;
-
-  virtual bool IsSupported(const std::string& f) {
-    if (f == "ExecutePythonFile" || f == "HandlePythonFileExecutionRequest") {
-      return true;
-    }
-    return false;
-  }
 };
