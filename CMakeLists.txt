@@ -34,7 +34,7 @@ else()
 endif()
 # This is the critical line for installing another package
 
-add_library(${TARGET} SHARED src/python_runtime_engine.cc)
+add_library(${TARGET} SHARED src/python_engine.cc)
 
 if(UNIX AND NOT APPLE)
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC")
