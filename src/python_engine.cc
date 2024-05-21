@@ -112,7 +112,7 @@ void PythonEngine::HandlePythonFileExecutionRequestImpl(
 };
 
 extern "C" {
-EngineI* get_engine() {
+CortexPythonEngineI* get_engine() {
   return new PythonEngine();
 }
 } // extern C
