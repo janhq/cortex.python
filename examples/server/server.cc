@@ -9,14 +9,14 @@
 #include "httplib.h"
 #include "json/reader.h"
 #include "json/forwards.h"
-#include "base/cortex-common/enginei.h"
+#include "base/cortex-common/cortexpythoni.h"
 #include "trantor/utils/Logger.h"
 
 class Server {
  public:
   Server() {
     dylib_ = std::make_unique<dylib>("./engines/cortex.python", "engine");
-    auto func = dylib_->get_function<EngineI*()>("get_engine");
+    auto func = dylib_->get_function<CortexPythonEngineI*()>("get_engine");
     engine_ = func();
   }
 
@@ -26,7 +26,7 @@ class Server {
     }
   }
 
-  EngineI* GetEngine() const {
+  CortexPythonEngineI* GetEngine() const {
     return engine_;
   }
 
@@ -53,7 +53,7 @@ class Server {
 
 private:
   std::unique_ptr<dylib> dylib_;
-  EngineI* engine_;
+  CortexPythonEngineI* engine_;
 
 };
 

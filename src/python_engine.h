@@ -2,11 +2,11 @@
 #include <functional>
 #include <memory>
 
-#include "base/cortex-common/enginei.h"
+#include "base/cortex-common/cortexpythoni.h"
 #include "json/forwards.h"
 #include "src/python_file_execution_request.h"
 
-class PythonEngine : public EngineI {
+class PythonEngine : public CortexPythonEngineI {
  public: 
   ~PythonEngine() final;
 
