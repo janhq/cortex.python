@@ -6,9 +6,9 @@
 #include "json/forwards.h"
 #include "src/python_file_execution_request.h"
 
-class PythonRuntimeEngine : public EngineI {
+class PythonEngine : public EngineI {
  public: 
-  ~PythonRuntimeEngine() final;
+  ~PythonEngine() final;
 
   void ExecutePythonFile(
       std::string binary_exec_path,

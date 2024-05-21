@@ -1,5 +1,5 @@
-#include "python_runtime_engine.h"
-#include "python_runtime_utils.h"
+#include "python_engine.h"
+#include "python_utils.h"
 #include "trantor/utils/Logger.h"
 
 #if defined(_WIN32)
@@ -14,18 +14,18 @@ constexpr const int k200OK = 200;
 constexpr const int k400BadRequest = 400;
 constexpr const int k500InternalServerError = 500;
 
-PythonRuntimeEngine::~PythonRuntimeEngine() {}
+PythonEngine::~PythonEngine() {}
 
-void PythonRuntimeEngine::ExecutePythonFile(
+void PythonEngine::ExecutePythonFile(
     std::string binary_execute_path,
     std::string file_execution_path,
     std::string python_library_path) {
 
-  std::string current_dir_path = PythonRuntimeUtils::GetDirectoryPathFromFilePath(binary_execute_path);
-  PythonRuntimeUtils::ExecutePythonFile(current_dir_path, file_execution_path, python_library_path);
+  std::string current_dir_path = python_utils::GetDirectoryPathFromFilePath(binary_execute_path);
+  python_utils::ExecutePythonFile(current_dir_path, file_execution_path, python_library_path);
 }
 
-void PythonRuntimeEngine::HandlePythonFileExecutionRequest(
+void PythonEngine::HandlePythonFileExecutionRequest(
     std::shared_ptr<Json::Value> json_body,
     std::function<void(Json::Value&&, Json::Value&&)>&& callback) {
 
@@ -35,7 +35,7 @@ void PythonRuntimeEngine::HandlePythonFileExecutionRequest(
 }
 
 
-void PythonRuntimeEngine::HandlePythonFileExecutionRequestImpl(
+void PythonEngine::HandlePythonFileExecutionRequestImpl(
     PythonRuntime::PythonFileExecution::PythonFileExecutionRequest&& request,
     std::function<void(Json::Value&&, Json::Value&&)> && callback) {
 
@@ -57,11 +57,11 @@ void PythonRuntimeEngine::HandlePythonFileExecutionRequestImpl(
   status_resp["status_code"] = k200OK;
 
 #if defined(_WIN32)
-  std::wstring exe_path = PythonRuntimeUtils::getCurrentExecutablePath();
+  std::wstring exe_path = python_utils::getCurrentExecutablePath();
   std::string exe_args_string = " --run_python_file " + file_execution_path;
   if (python_library_path != "")
       exe_args_string += " " + python_library_path;
-  std::wstring pyArgs = exe_path + PythonRuntimeUtils::stringToWString(exe_args_string);
+  std::wstring pyArgs = exe_path + python_utils::stringToWString(exe_args_string);
 
   STARTUPINFOW si;
   PROCESS_INFORMATION pi;
@@ -79,7 +79,7 @@ void PythonRuntimeEngine::HandlePythonFileExecutionRequestImpl(
     WaitForSingleObject(pi.hProcess, INFINITE);
   }
 #else
-  std::string child_process_exe_path = PythonRuntimeUtils::getCurrentExecutablePath();
+  std::string child_process_exe_path = python_utils::getCurrentExecutablePath();
   std::vector<char*> child_process_args;
   child_process_args.push_back(const_cast<char*>(child_process_exe_path.c_str()));
   child_process_args.push_back(const_cast<char*>("--run_python_file"));
@@ -113,6 +113,6 @@ void PythonRuntimeEngine::HandlePythonFileExecutionRequestImpl(
 
 extern "C" {
 EngineI* get_engine() {
-  return new PythonRuntimeEngine();
+  return new PythonEngine();
 }
 } // extern C

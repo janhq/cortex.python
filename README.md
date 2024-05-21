@@ -1,4 +1,4 @@
-# cortex.python-runtime
+# cortex.python
 **Python embedding on C++**
 
 Each python execution request will create a new child process for python runtime by using `<process.h>` on Windows and `<spawn.h>` on UNIX (Linux and MacOS).
@@ -8,13 +8,13 @@ Each python execution request will create a new child process for python runtime
 ### Linux and MacOS
 1. Install dependencies:
 ```bash
-# In cortex.python-runtime/ root dir
+# In cortex.python/ root dir
 ./install_deps.sh
 ```
 
 2. Build the project
 ```bash
-# In cortex.python-runtime/ root dir
+# In cortex.python/ root dir
 mkdir build && cd build
 cmake ..
 make -j32
@@ -23,14 +23,14 @@ make -j32
 ### Windows (testing)
 1. Install dependencies
 ```powershell
-# In cortex.python-runtime\ root dir
+# In cortex.python\ root dir
 cmake -S ./third-party -B ./build_deps/third-party
 cmake --build ./build_deps/third-party --config Release
 ```
 
 2. Build the project
 ```powershell
-# In cortex.python-runtime\ root dir
+# In cortex.python\ root dir
 mkdir -p build
 cd build
 cmake ..
@@ -47,11 +47,11 @@ Go to the `.../build/` directory.
 
 While running the python-runtime with no argument, it will use the default `.../build/python/` library
 ```
-~/cortex.python-runtime/build$ ./python-runtime
+~/cortex.python/build$ ./python-runtime
 ```
 Or, you can use your desired Python3 version by adding a path to the directory that contain the `libpython***.so` or `libpython***.dylib` file.
 ```
-~/cortex.python-runtime/build$ ./python-runtime {PATH_TO_DYNAMIC_LIB_DIR}
+~/cortex.python/build$ ./python-runtime {PATH_TO_DYNAMIC_LIB_DIR}
 ```
 
 Then input the path to your Python file that need to be executed. You can input **multiple times**, each input will create a new child process for Python runtime.
@@ -75,7 +75,7 @@ Then input the path to your Python file that need to be executed. You can input 
 Updating... 🙏 
 ### Linux
 ```bash
-# In cortex.python-runtime/ root dir
+# In cortex.python/ root dir
 cd ./build/python/
 export PYTHONHOME=$(pwd)
 ./bin/python3 -m ensurepip
@@ -104,37 +104,37 @@ print("Hello from Cortex!")
 
 ```
 # Default library
-~/cortex.python-runtime/build$ ./python-runtime
+~/cortex.python/build$ ./python-runtime
 python-runtime started
 
 /home/jan/cortex/main.py
 Created child process for Python embedding
-No specified Python library path, using default Python library in /home/jan/cortex.python-runtime/build/python/
-Found dynamic library file /home/jan/cortex.python-runtime/build/python/libpython3.10.so.1.0
-Successully loaded Python dynamic library from file: /home/jan/cortex.python-runtime/build/python/libpython3.10.so.1.0
+No specified Python library path, using default Python library in /home/jan/cortex.python/build/python/
+Found dynamic library file /home/jan/cortex.python/build/python/libpython3.10.so.1.0
+Successully loaded Python dynamic library from file: /home/jan/cortex.python/build/python/libpython3.10.so.1.0
 Trying to run Python file in path /home/jan/cortex/main.py
 
-/home/jan/cortex.python-runtime/build/python/lib/python/site-packages/
-/home/jan/cortex.python-runtime/build/python/lib/python/lib-dynload/
-/home/jan/cortex.python-runtime/build/python/lib/python/
+/home/jan/cortex.python/build/python/lib/python/site-packages/
+/home/jan/cortex.python/build/python/lib/python/lib-dynload/
+/home/jan/cortex.python/build/python/lib/python/
 Hello from Cortex!
 
 /home/jan/cortex/main.py
 Created child process for Python embedding
-No specified Python library path, using default Python library in /home/jan/cortex.python-runtime/build/python/
-Found dynamic library file /home/jan/cortex.python-runtime/build/python/libpython3.10.so.1.0
-Successully loaded Python dynamic library from file: /home/jan/cortex.python-runtime/build/python/libpython3.10.so.1.0
+No specified Python library path, using default Python library in /home/jan/cortex.python/build/python/
+Found dynamic library file /home/jan/cortex.python/build/python/libpython3.10.so.1.0
+Successully loaded Python dynamic library from file: /home/jan/cortex.python/build/python/libpython3.10.so.1.0
 Trying to run Python file in path /home/jan/cortex/main.py
 
-/home/jan/cortex.python-runtime/build/python/lib/python/site-packages/
-/home/jan/cortex.python-runtime/build/python/lib/python/lib-dynload/
-/home/jan/cortex.python-runtime/build/python/lib/python/
+/home/jan/cortex.python/build/python/lib/python/site-packages/
+/home/jan/cortex.python/build/python/lib/python/lib-dynload/
+/home/jan/cortex.python/build/python/lib/python/
 Hello from Cortex!
 ```
 
 ```
 # With specific python version
-~/cortex.python-runtime/build$ ./python-runtime /usr/lib/python3.10/config-3.10-x86_64-linux-gnu/
+~/cortex.python/build$ ./python-runtime /usr/lib/python3.10/config-3.10-x86_64-linux-gnu/
 python-runtime started
 
 /home/jan/cortex/main.py

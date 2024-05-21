@@ -15,7 +15,7 @@
 class Server {
  public:
   Server() {
-    dylib_ = std::make_unique<dylib>("./engines/cortex.python-runtime", "engine");
+    dylib_ = std::make_unique<dylib>("./engines/cortex.python", "engine");
     auto func = dylib_->get_function<EngineI*()>("get_engine");
     engine_ = func();
   }
