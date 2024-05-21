@@ -11,7 +11,7 @@
 
 #if defined(_WIN32)
   #define PY_DL HMODULE
-  #define PY_LOAD_LIB(path) LoadLibraryW(PythonRuntimeUtils::stringToWString(path).c_str());
+  #define PY_LOAD_LIB(path) LoadLibraryW(python_utils::stringToWString(path).c_str());
   #define GET_PY_FUNC GetProcAddress
   #define PY_FREE_LIB FreeLibrary
 #else
@@ -34,7 +34,7 @@
 #include <mach-o/dyld.h>
 #endif
 
-namespace PythonRuntimeUtils {
+namespace python_utils {
 
 typedef long Py_ssize_t;
 typedef struct _object PyObject;
@@ -166,7 +166,7 @@ inline void ClearAndSetPythonSysPath(std::string default_py_lib_path, PY_DL py_d
 inline void ExecutePythonFile(std::string binary_exec_path, std::string py_file_path ,std::string py_lib_path) {
 
   signal(SIGINT, SignalHandler);
-  std::string binary_dir_path = PythonRuntimeUtils::GetDirectoryPathFromFilePath(binary_exec_path);
+  std::string binary_dir_path = python_utils::GetDirectoryPathFromFilePath(binary_exec_path);
 
   bool is_default_python_lib = false;
   if (py_lib_path == "") {
@@ -229,4 +229,4 @@ inline void ExecutePythonFile(std::string binary_exec_path, std::string py_file_
 }
 
 
-} // namespace PythonRuntimeUtils
+} // namespace python_utils
