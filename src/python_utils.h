@@ -171,7 +171,7 @@ inline void ExecutePythonFile(std::string binary_exec_path, std::string py_file_
   bool is_default_python_lib = false;
   if (py_lib_path == "") {
     is_default_python_lib = true;
-    py_lib_path = binary_dir_path + "python/";
+    py_lib_path = binary_dir_path + "engines/cortex.python/python/";
     LOG_WARN << "No specified Python library path, using default Python library in " << py_lib_path;
   }
 

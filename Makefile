@@ -26,11 +26,11 @@ endif
 
 build-example-server:
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "mkdir -p .\examples\server\build; cd .\examples\server\build; cmake .. $(CMAKE_EXTRA_FLAGS); cmake --build . --config Release; cp -r ..\..\..\build\python .\Release\python"
+	@powershell -Command "mkdir -p .\examples\server\build\engines\cortex.python; cd .\examples\server\build; cmake .. $(CMAKE_EXTRA_FLAGS); cmake --build . --config Release; cp -r ..\..\..\build\python .\Release\engines\cortex.python\python"
 else
-	mkdir -p examples/server/build
+	mkdir -p examples/server/build/engines/cortex.python
 	cd examples/server/build && cmake .. && cmake --build . --config Release -j12
-	cp -r build/python examples/server/build
+	cp -r build/python examples/server/build/engines/cortex.python
 endif
 
 package:
