@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(cortex.python-runtime C CXX)
+project(cortex.python C CXX)
 set(TARGET engine)
 
 include(CheckIncludeFileCXX)

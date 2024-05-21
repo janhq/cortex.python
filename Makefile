@@ -35,12 +35,12 @@ endif
 
 package:
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "mkdir -p cortex.python-runtime; cp build\Release\engine.dll cortex.python-runtime\; cp -r build\python cortex.python-runtime\; 7z a -ttar temp.tar cortex.python-runtime\*; 7z a -tgzip cortex.python-runtime.tar.gz temp.tar;"
+	@powershell -Command "mkdir -p cortex.python; cp build\Release\engine.dll cortex.python\; cp -r build\python cortex.python\; 7z a -ttar temp.tar cortex.python\*; 7z a -tgzip cortex.python.tar.gz temp.tar;"
 else
-	@mkdir -p cortex.python-runtime && \
-	cp build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') cortex.python-runtime && \
-	cp -r build/python cortex.python-runtime
-	tar -czvf cortex.python-runtime.tar.gz cortex.python-runtime
+	@mkdir -p cortex.python && \
+	cp build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') cortex.python && \
+	cp -r build/python cortex.python
+	tar -czvf cortex.python.tar.gz cortex.python
 endif
 
 run-e2e-test:
@@ -48,18 +48,18 @@ ifeq ($(RUN_TESTS),false)
 	@echo "Skipping tests"
 else
 ifeq ($(OS),Windows_NT)
-	@powershell -Command "mkdir -p .\examples\server\build\Release\engines\cortex.python-runtime; cd examples\server\build\Release; cp ..\..\..\..\build\Release\engine.dll engines\cortex.python-runtime; ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\..\$(PYTHON_FILE_EXECUTION_PATH);"
+	@powershell -Command "mkdir -p .\examples\server\build\Release\engines\cortex.python; cd examples\server\build\Release; cp ..\..\..\..\build\Release\engine.dll engines\cortex.python; ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\..\$(PYTHON_FILE_EXECUTION_PATH);"
 else
-	@mkdir -p examples/server/build/engines/cortex.python-runtime && \
+	@mkdir -p examples/server/build/engines/cortex.python && \
 	cd examples/server/build && \
-	cp ../../../build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') engines/cortex.python-runtime/ && \
+	cp ../../../build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') engines/cortex.python/ && \
 	chmod +x ../../../.github/scripts/e2e-test-server-linux-and-mac.sh && ../../../.github/scripts/e2e-test-server-linux-and-mac.sh ./server ../../../$(PYTHON_FILE_EXECUTION_PATH)
 endif
 endif
 
 clean:
 ifeq ($(OS),Windows_NT)
-	cmd /C "rmdir /S /Q build examples\\server\\build cortex.python-runtime cortex.python-runtime.tar.gz cortex.python-runtime.zip"
+	cmd /C "rmdir /S /Q build examples\\server\\build cortex.python cortex.python.tar.gz cortex.python.zip"
 else
-	rm -rf build examples/server/build cortex.python-runtime cortex.python-runtime.tar.gz cortex.python-runtime.zip
+	rm -rf build examples/server/build cortex.python cortex.python.tar.gz cortex.python.zip
 endif
