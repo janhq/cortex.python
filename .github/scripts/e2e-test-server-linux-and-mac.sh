@@ -21,7 +21,7 @@ range=$((max - min + 1))
 PORT=$((RANDOM % range + min))
 
 # Install numpy for Python
-export PYTHONHOME=$(pwd)/python/
+export PYTHONHOME=$(pwd)/engines/cortex.python/python/
 export LD_LIBRARY_PATH="$PYTHONHOME:$LD_LIBRARY_PATH"
 echo "Set Python HOME to $PYTHONHOME"
 ./python/bin/python3 -m ensurepip

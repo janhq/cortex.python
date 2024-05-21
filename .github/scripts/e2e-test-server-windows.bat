@@ -26,7 +26,7 @@ set /a range=max-min+1
 set /a PORT=%min% + %RANDOM% %% %range%
 
 rem Install numpy for Python
-set "PYTHONHOME=%cd%\python"
+set "PYTHONHOME=%cd%\engines\cortex.python\python"
 echo Set Python HOME to %PYTHONHOME%
 %PYTHONHOME%\python.exe -m ensurepip
 %PYTHONHOME%\python.exe -m pip install --upgrade pip
