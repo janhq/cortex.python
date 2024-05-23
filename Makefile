@@ -27,10 +27,16 @@ endif
 build-example-server:
 ifeq ($(OS),Windows_NT)
 	@powershell -Command "mkdir -p .\examples\server\build\engines\cortex.python; cd .\examples\server\build; cmake .. $(CMAKE_EXTRA_FLAGS); cmake --build . --config Release; cp -r ..\..\..\build\python .\Release\engines\cortex.python\python"
-else
-	mkdir -p examples/server/build/engines/cortex.python
-	cd examples/server/build && cmake .. && cmake --build . --config Release -j12
-	cp -r build/python examples/server/build/engines/cortex.python
+else 
+	@mkdir -p examples/server/build/engines/cortex.python; \
+	cp -rf build_deps/_install/lib/engines-3 build/python/; \
+	cp -rf build_deps/_install/lib/libcrypto.* build/python/; \
+	cp -rf build_deps/_install/lib/libssl.* build/python/; \
+	cp -rf build_deps/_install/lib/ossl-modules build/python/; \
+	cp -r build/python examples/server/build/engines/cortex.python; \
+	ls examples/server/build/engines/cortex.python/python;
+	@cd examples/server/build; \
+	cmake .. && cmake --build . --config Release -j12
 endif
 
 package:
@@ -51,6 +57,7 @@ ifeq ($(OS),Windows_NT)
 	@powershell -Command "mkdir -p .\examples\server\build\Release\engines\cortex.python; cd examples\server\build\Release; cp ..\..\..\..\build\Release\engine.dll engines\cortex.python; ..\..\..\..\.github\scripts\e2e-test-server-windows.bat server.exe ..\..\..\..\$(PYTHON_FILE_EXECUTION_PATH);"
 else
 	@mkdir -p examples/server/build/engines/cortex.python && \
+	rm -rf build_deps && \
 	cd examples/server/build && \
 	cp ../../../build/libengine.$(shell uname | tr '[:upper:]' '[:lower:]' | sed 's/darwin/dylib/;s/linux/so/') engines/cortex.python/ && \
 	chmod +x ../../../.github/scripts/e2e-test-server-linux-and-mac.sh && ../../../.github/scripts/e2e-test-server-linux-and-mac.sh ./server ../../../$(PYTHON_FILE_EXECUTION_PATH)
