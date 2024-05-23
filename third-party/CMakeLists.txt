@@ -92,6 +92,17 @@ if(APPLE)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  # Download and install OpenSSL
+  ExternalProject_Add(
+    OpenSSL
+    URL https://www.openssl.org/source/openssl-3.3.0.tar.gz
+    PREFIX ${THIRD_PARTY_INSTALL_PATH}
+    CONFIGURE_COMMAND ./Configure --prefix=<INSTALL_DIR> --libdir=lib
+    BUILD_COMMAND make -j8
+    INSTALL_COMMAND make install
+    BUILD_IN_SOURCE 1
+  )
+
   # Download and install zlib
   ExternalProject_Add(
     zlib
@@ -139,7 +150,7 @@ if (UNIX) # APPLE and LINUX
   else()
     set(PYTHON_INSTALL_CONFIG_HOST "")
     set(PYTHON_INSTALL_CONFIG_BUILD "")
-    set(PYTHON_INSTALL_CONFIG_SSL "")
+    set(PYTHON_INSTALL_CONFIG_SSL "--with-openssl=${THIRD_PARTY_INSTALL_PATH} --with-openssl-rpath=auto")
   endif()
 
   # Download and install Python3 from source
@@ -157,7 +168,7 @@ if (UNIX) # APPLE and LINUX
   if(APPLE)
     add_dependencies(Python3 XZUtils OpenSSL)
   else() # Linux
-    add_dependencies(Python3 zlib libffi)
+    add_dependencies(Python3 zlib libffi OpenSSL)
   endif()
 
 else() # WINDOWS
