@@ -153,7 +153,7 @@ if (UNIX) # APPLE and LINUX
   # Download and install Python3 from source
   ExternalProject_Add(
     Python3
-    URL https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
+    URL https://www.python.org/ftp/python/3.12.7/Python-3.12.7.tgz
     PREFIX ${THIRD_PARTY_INSTALL_PATH}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${THIRD_PARTY_INSTALL_PATH}/lib:${LD_LIBRARY_PATH} ./configure --prefix=<INSTALL_DIR> --enable-optimizations --with-ensurepip=install --enable-shared ${PYTHON_INSTALL_CONFIG_HOST} ${PYTHON_INSTALL_CONFIG_BUILD} ${PYTHON_INSTALL_CONFIG_SSL}
     BUILD_COMMAND make -j12
@@ -172,7 +172,7 @@ else() # WINDOWS
   ExternalProject_Add(
     Python3
     PREFIX "${CMAKE_BINARY_DIR}/python"
-    URL "https://www.python.org/ftp/python/3.10.4/python-3.10.4-amd64.exe"
+    URL "https://www.python.org/ftp/python/3.12.7/python-3.12.7-amd64.exe"
     DOWNLOAD_NO_EXTRACT 1
     CONFIGURE_COMMAND ""  # No configure command
     BUILD_COMMAND ""  # No build command

@@ -86,7 +86,7 @@ void PythonEngine::HandlePythonFileExecutionRequestImpl(
   child_process_args.push_back(const_cast<char*>(file_execution_path.c_str()));
   if (python_library_path != "")
       child_process_args.push_back(const_cast<char*>(python_library_path.c_str()));
-
+  child_process_args.push_back(nullptr);
   pid_t pid;
 
   int status = posix_spawn(&pid, child_process_exe_path.c_str(), nullptr, 
