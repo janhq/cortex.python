@@ -8,7 +8,7 @@ if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 cd %INSTALL_DIR%
 
 echo Downloading Python...
-curl -o python-installer.exe https://www.python.org/ftp/python/3.10.4/python-3.10.4-amd64.exe
+curl -o python-installer.exe https://www.python.org/ftp/python/3.12.7/python-3.12.7-amd64.exe
 
 echo Installing Python to %INSTALL_DIR%
 start /wait python-installer.exe /quiet InstallAllUsers=0 PrependPath=0 TargetDir=%INSTALL_DIR% Include_pip=1 Include_test=0

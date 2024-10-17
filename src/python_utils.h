@@ -102,25 +102,57 @@ inline std::string GetDirectoryPathFromFilePath(const std::string& file_path) {
   }
   return "./";
 }
-
 inline std::string FindPythonDynamicLib(const std::string& lib_dir) {
-  std::string pattern;
-#if defined(_WIN32) || defined(_WIN64)
-  pattern = "python[0-9][0-9]+\\.dll";
-#elif defined(__APPLE__) || defined(__MACH__)
-  pattern = "libpython[0-9]+\\.[0-9]+\\.dylib";
-#else
-  pattern = "libpython[0-9]+\\.[0-9]+\\.so.*";
-#endif
-  std::regex regex_pattern(pattern);
-  for (const auto& entry : std::filesystem::directory_iterator(lib_dir)) {
-    std::string file_name = entry.path().filename().string();
-    if (std::regex_match(file_name, regex_pattern)) {
-      return entry.path().string();
+  try {
+    LOG_INFO << "Entering FindPythonDynamicLib, lib_dir: " << lib_dir;
+
+    if (lib_dir.empty()) {
+      LOG_ERROR << "lib_dir is empty";
+      return "";
     }
+
+    std::string pattern;
+#if defined(_WIN32) || defined(_WIN64)
+    pattern = "python[0-9][0-9]+\\.dll";
+#elif defined(__APPLE__) || defined(__MACH__)
+    pattern = "libpython[0-9]+\\.[0-9]+\\.dylib";
+#else
+    pattern = "libpython[0-9]+\\.[0-9]+\\.so.*";
+#endif
+    LOG_INFO << "Pattern: " << pattern;
+
+    std::regex regex_pattern(pattern);
+    LOG_INFO << "Regex pattern compiled successfully";
+
+    if (!std::filesystem::exists(lib_dir)) {
+      LOG_ERROR << "Directory does not exist: " << lib_dir;
+      return "";
+    }
+
+    if (!std::filesystem::is_directory(lib_dir)) {
+      LOG_ERROR << "Path is not a directory: " << lib_dir;
+      return "";
+    }
+
+    LOG_INFO << "Starting directory iteration";
+    for (const auto& entry : std::filesystem::directory_iterator(lib_dir)) {
+      std::string file_name = entry.path().filename().string();
+      LOG_INFO << "File name: " << file_name;
+      if (std::regex_match(file_name, regex_pattern)) {
+        LOG_INFO << "Match found: " << entry.path().string();
+        return entry.path().string();
+      }
+    }
+
+    LOG_ERROR << "No Python dynamic library found in " << lib_dir;
+    return "";
+  } catch (const std::exception& e) {
+    LOG_ERROR << "Exception in FindPythonDynamicLib: " << e.what();
+    return "";
+  } catch (...) {
+    LOG_ERROR << "Unknown exception in FindPythonDynamicLib";
+    return "";
   }
-  LOG_ERROR << "No Python dynamic library found in " << lib_dir;
-  return "";
 }
 
 inline void ClearAndSetPythonSysPath(const std::string& default_py_lib_path,
@@ -183,7 +215,10 @@ inline void ExecutePythonFile(const std::string& binary_exec_path,
 
   std::string effective_py_lib_path = py_lib_path;
   if (effective_py_lib_path.empty()) {
-    effective_py_lib_path = binary_dir_path + "engines/cortex.python/python/";
+    effective_py_lib_path =
+        (std::filesystem::path(binary_dir_path) /
+         std::filesystem::path("engines/cortex.python/python/"))
+            .string();
     LOG_WARN << "No specified Python library path, using default: "
              << effective_py_lib_path;
   }

@@ -4,6 +4,9 @@
 
 #if defined(_WIN32)
 #include <process.h>
+#include <processthreadsapi.h>
+#include <userenv.h>
+#pragma comment(lib, "userenv.lib")
 #else
 #include <spawn.h>
 #include <sys/wait.h>
@@ -58,11 +61,14 @@ void PythonEngine::HandlePythonFileExecutionRequestImpl(
 
 #if defined(_WIN32)
   std::wstring exe_path = python_utils::getCurrentExecutablePath();
-  std::string exe_args_string = " --run_python_file " + file_execution_path;
-  if (!python_library_path.empty())
-    exe_args_string += " --python_library_path " + python_library_path;
-  std::wstring pyArgs =
-      exe_path + python_utils::stringToWString(exe_args_string);
+  std::wstring command_line =
+      L"\"" + exe_path + L"\" --run_python_file \"" +
+      python_utils::stringToWString(file_execution_path) + L"\"";
+
+  if (!python_library_path.empty()) {
+    command_line +=
+        L" \"" + python_utils::stringToWString(python_library_path) + L"\"";
+  }
 
   STARTUPINFOW si;
   PROCESS_INFORMATION pi;
@@ -70,28 +76,80 @@ void PythonEngine::HandlePythonFileExecutionRequestImpl(
   si.cb = sizeof(si);
   ZeroMemory(&pi, sizeof(pi));
 
-  if (!CreateProcessW(
-          const_cast<wchar_t*>(exe_path.c_str()),
-          const_cast<wchar_t*>(pyArgs.c_str()),
-          NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-    LOG_ERROR << "Failed to create child process: " << GetLastError();
+  // Prepare environment block
+  LPWCH envBlock = GetEnvironmentStringsW();
+  if (envBlock == NULL) {
+    LOG_ERROR << "Failed to get environment block";
     json_resp["message"] = "Failed to execute the Python file";
+    status_resp["status_code"] = k500InternalServerError;
+    callback(std::move(status_resp), std::move(json_resp));
+    return;
+  }
+
+  std::wstring env_block;
+  for (LPCWSTR env = envBlock; *env != L'\0'; env += wcslen(env) + 1) {
+    env_block += env;
+    env_block += L'\0';
+  }
+  FreeEnvironmentStringsW(envBlock);
+
+  // Add or modify PYTHONPATH
+  std::wstring pythonpath =
+      L"PYTHONPATH=" + python_utils::stringToWString(python_library_path);
+  env_block += pythonpath;
+  env_block += L'\0';
+  env_block += L'\0';  // Double null-termination
+
+  LPVOID pEnv = NULL;
+  if (!CreateEnvironmentBlock(&pEnv, NULL, FALSE)) {
+    LOG_ERROR << "Failed to create environment block";
+    json_resp["message"] = "Failed to execute the Python file";
+    status_resp["status_code"] = k500InternalServerError;
+    callback(std::move(status_resp), std::move(json_resp));
+    return;
+  }
+
+  if (!CreateProcessW(NULL, const_cast<LPWSTR>(command_line.c_str()), NULL,
+                      NULL, FALSE, CREATE_UNICODE_ENVIRONMENT, pEnv, NULL, &si,
+                      &pi)) {
+    DWORD error = GetLastError();
+    LOG_ERROR << "Failed to create child process: " << error;
+    json_resp["message"] = "Failed to execute the Python file. Error code: " +
+                           std::to_string(error);
     status_resp["status_code"] = k500InternalServerError;
   } else {
     LOG_INFO << "Created child process for Python embedding";
     WaitForSingleObject(pi.hProcess, INFINITE);
+
+    DWORD exit_code;
+    if (GetExitCodeProcess(pi.hProcess, &exit_code)) {
+      if (exit_code != 0) {
+        LOG_ERROR << "Child process exited with status: " << exit_code;
+        json_resp["message"] = "Python script execution failed";
+        status_resp["status_code"] = k500InternalServerError;
+      }
+    } else {
+      LOG_ERROR << "Failed to get exit code: " << GetLastError();
+      json_resp["message"] = "Failed to get Python script execution status";
+      status_resp["status_code"] = k500InternalServerError;
+    }
+
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
   }
+
+  DestroyEnvironmentBlock(pEnv);
 #else
   std::string child_process_exe_path = python_utils::getCurrentExecutablePath();
   std::vector<char*> child_process_args;
-  child_process_args.push_back(const_cast<char*>(child_process_exe_path.c_str()));
+  child_process_args.push_back(
+      const_cast<char*>(child_process_exe_path.c_str()));
   child_process_args.push_back(const_cast<char*>("--run_python_file"));
   child_process_args.push_back(const_cast<char*>(file_execution_path.c_str()));
 
   if (!python_library_path.empty()) {
-    child_process_args.push_back(const_cast<char*>(python_library_path.c_str()));
+    child_process_args.push_back(
+        const_cast<char*>(python_library_path.c_str()));
   }
   child_process_args.push_back(NULL);
 
@@ -105,7 +163,7 @@ void PythonEngine::HandlePythonFileExecutionRequestImpl(
   for (char** env = environ; *env != nullptr; env++) {
     env_strings.push_back(*env);
   }
-  
+
   // Add or modify PYTHONPATH
   std::string pythonpath = "PYTHONPATH=" + python_library_path;
   env_strings.push_back(pythonpath);
